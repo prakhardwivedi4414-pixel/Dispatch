@@ -37,33 +37,33 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs font-sans text-ink-400">
               <li>
-                <Link to="/section/campus" className="hover:text-paper-100 transition-colors">
-                  Campus Affairs & Governance
+                <Link to="/latest" className="hover:text-paper-100 transition-colors">
+                  Latest Dispatches
+                </Link>
+              </li>
+              <li>
+                <Link to="/features" className="hover:text-paper-100 transition-colors">
+                  Features & In-Depth Stories
+                </Link>
+              </li>
+              <li>
+                <Link to="/campus" className="hover:text-paper-100 transition-colors">
+                  Campus Life & Student Affairs
                 </Link>
               </li>
               <li>
                 <Link to="/section/society" className="hover:text-paper-100 transition-colors">
-                  Society & Mutual Aid
+                  Society & Public Policy
                 </Link>
               </li>
               <li>
-                <Link to="/section/culture" className="hover:text-paper-100 transition-colors">
-                  Culture & Visual Arts
+                <Link to="/multimedia" className="hover:text-paper-100 transition-colors">
+                  Visual & Photo Journalism
                 </Link>
               </li>
               <li>
                 <Link to="/section/investigations" className="hover:text-paper-100 transition-colors">
                   Investigative Reporting
-                </Link>
-              </li>
-              <li>
-                <Link to="/multimedia" className="hover:text-paper-100 transition-colors">
-                  Audio & Video Multimedia
-                </Link>
-              </li>
-              <li>
-                <Link to="/look-closer" className="text-editorial-red hover:underline">
-                  Look Closer: Evidence Lab
                 </Link>
               </li>
             </ul>
@@ -90,7 +90,16 @@ export const Footer: React.FC = () => {
 
             <div className="p-3 bg-ink-900 border border-ink-800 text-xs font-mono text-ink-400">
               <span className="text-paper-200 block font-bold mb-0.5">Editor: {settings.editorName}</span>
-              <span>{settings.editionLabel}</span>
+              <span className="block mb-1">{settings.editionLabel}</span>
+              <span className="text-[11px] text-ink-400 block">
+                Desk Contact:{' '}
+                <a
+                  href="mailto:samridhiaug@gmail.com"
+                  className="text-editorial-red hover:underline font-bold"
+                >
+                  samridhiaug@gmail.com
+                </a>
+              </span>
             </div>
           </div>
         </div>
@@ -103,12 +112,12 @@ export const Footer: React.FC = () => {
 
           <div className="flex items-center gap-6">
             <Link
-              to="/editorial/login"
+              to="/login"
               className="inline-flex items-center gap-1 text-ink-400 hover:text-paper-100 transition-colors"
               title="Staff & Contributor Portal"
             >
               <Lock className="w-3 h-3" />
-              <span>Editorial login</span>
+              <span>Staff sign in</span>
             </Link>
 
             <button

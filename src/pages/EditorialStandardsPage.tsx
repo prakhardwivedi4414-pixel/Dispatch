@@ -72,10 +72,10 @@ export const EditorialStandardsPage: React.FC = () => {
           </div>
           <div className="space-y-3 font-serif text-sm sm:text-base text-ink-800 leading-relaxed">
             <p>
-              Every photograph, video clip, and audio segment must carry an explicit attribution credit identifying the student photographer or videographer.
+              Every photograph, document extract, and media asset must carry an explicit attribution credit identifying the verified contributor and primary source. Visual materials are preserved directly from verified documentary records and never falsely attributed.
             </p>
             <p className="text-xs font-mono text-ink-600 bg-paper-200 p-3 border border-rule">
-              <strong>Photo Manipulation Prohibition:</strong> Documentary photographs must not be staged, artificially generated, or digitally manipulated to add or remove objects. Standard color balance, contrast calibration, and cropping are permissible, but must preserve photographic truth.
+              <strong>Photo Manipulation & Authenticity Rule:</strong> Documentary photographs must not be staged or digitally altered to mislead readers. Where an illustration or graphic composite is used, it is transparently labeled as an editorial illustration rather than documentary photojournalism.
             </p>
           </div>
         </section>
@@ -135,7 +135,15 @@ export const EditorialStandardsPage: React.FC = () => {
       {/* Footer Contact Statement */}
       <div className="mt-14 p-6 bg-paper-200 border border-rule text-xs font-mono text-ink-600">
         <p className="font-bold text-ink-900 mb-1">Editorial Queries & Ethical Inquiries:</p>
-        <p>Contact Editor-in-Chief via the newsroom desk: <span className="text-editorial-red">standards@thedispatch.internal</span></p>
+        <p>
+          Contact Editor-in-Chief via the newsroom desk:{' '}
+          <a
+            href="mailto:samridhiaug@gmail.com"
+            className="text-editorial-red hover:underline font-bold"
+          >
+            samridhiaug@gmail.com
+          </a>
+        </p>
       </div>
     </div>
   );

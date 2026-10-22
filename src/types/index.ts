@@ -9,12 +9,25 @@ export type StoryFormat = 'long-read' | 'short' | 'photo' | 'audio' | 'video';
 
 export type StoryStatus = 'draft' | 'review' | 'published';
 
+export type ContributionRole =
+  | 'Reporter / Writer'
+  | 'Photographer'
+  | 'Videographer'
+  | 'Audio Producer'
+  | 'Editor'
+  | 'Researcher'
+  | string;
+
 export interface Contributor {
   id: string;
   name: string;
-  role: string;
+  role: string; // e.g. Staff Reporter, Visuals Editor, Audio Lead
   bio?: string;
-  contribution?: string;
+  contribution?: string; // Specific contribution note on article
+  contributionRole?: ContributionRole; // Specific assigned role on story
+  profileImage?: string;
+  profileLink?: string;
+  isPrimary?: boolean;
 }
 
 export interface StoryCover {
@@ -24,6 +37,8 @@ export interface StoryCover {
   caption: string;
   width?: number;
   height?: number;
+  source?: string; // e.g. "Pinterest (Provisional reference)" | "Original Newsroom Photography"
+  isVerifiedSource?: boolean; // false if sourced from Pinterest or unverified
 }
 
 export interface PhotoItem {
@@ -33,6 +48,8 @@ export interface PhotoItem {
   photographer: string;
   altText?: string;
   location?: string;
+  source?: string;
+  isVerifiedSource?: boolean;
 }
 
 export interface SourceItem {
@@ -53,6 +70,13 @@ export interface StoryMedia {
   transcript?: string;
 }
 
+export interface SourcePdf {
+  filename: string;
+  url: string;
+  sizeBytes: number;
+  pageCount: number;
+}
+
 export interface Story {
   id: string;
   slug: string;
@@ -69,6 +93,9 @@ export interface Story {
   cover: StoryCover;
   media?: StoryMedia;
   sources?: SourceItem[];
+  sourcePdf?: SourcePdf;
+  pdfPages?: string[];
   isLead: boolean;
   isDemo: boolean;
 }
+

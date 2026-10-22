@@ -1,9 +1,12 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { INTERNAL_ASSESSMENT_DOSSIER } from '../../data/internalAssessmentData';
 import { ArrowLeft, Printer, CheckCircle2, BookOpen } from 'lucide-react';
 
 export const InternalAssessmentPage: React.FC = () => {
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/editorial';
+
   useEffect(() => {
     document.title = 'Internal Assessment & Syllabus Audit — The Dispatch';
   }, []);
@@ -20,7 +23,7 @@ export const InternalAssessmentPage: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-8 border-b-2 border-ink-950 print:hidden">
         <div className="flex items-center gap-3">
           <Link
-            to="/editorial"
+            to={basePath}
             className="p-2 bg-paper-100 border border-rule hover:border-ink-950 text-ink-700 transition-colors"
             title="Back to Dashboard"
           >

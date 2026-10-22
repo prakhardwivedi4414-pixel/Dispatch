@@ -22,26 +22,27 @@ describe('Search Functionality & Field Matching', () => {
   };
 
   it('finds stories by headline keywords (case-insensitive)', () => {
-    const results = performSearch('NIGHT SHIFT');
+    const results = performSearch('DU STUDENTS');
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0].headline).toContain('Night Shift');
+    expect(results[0].headline).toContain('DU Students');
   });
 
   it('finds stories by reporter name', () => {
-    const results = performSearch('Maya Chen');
+    const results = performSearch('Arpita Singh');
     expect(results.length).toBeGreaterThan(0);
-    expect(results.some(s => s.authors.some(a => a.name === 'Maya Chen'))).toBe(true);
+    expect(results.some(s => s.authors.some(a => a.name === 'Arpita Singh'))).toBe(true);
   });
 
   it('finds stories by terms within the deep body text', () => {
-    const results = performSearch('subterranean');
+    const results = performSearch('pilgrimage');
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0].id).toBe('dispatch-night-shift');
+    expect(results[0].id).toBe('dispatch-delhi-daily-commute');
   });
 
   it('filters results by category', () => {
-    const allResults = performSearch('dispatch');
-    const campusOnly = performSearch('care', 'Campus');
+    const allResults = performSearch('protest');
+    expect(allResults.length).toBeGreaterThan(0);
+    const campusOnly = performSearch('attendance', 'Campus');
     expect(campusOnly.every(s => s.category === 'Campus')).toBe(true);
   });
 

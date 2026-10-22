@@ -58,11 +58,6 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
           <span className="font-mono text-sm text-ink-700">
             {total} Documentary Frames
           </span>
-          {total < 7 && (
-            <span className="text-xs text-editorial-red font-semibold">
-              (Assignment target: 7–10 photos)
-            </span>
-          )}
         </div>
 
         {/* View Switcher Controls */}

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useNewsroom } from '../context/NewsroomContext';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
@@ -11,17 +11,29 @@ import { VideoPlayer } from '../components/media/VideoPlayer';
 import { PhotoGallery } from '../components/media/PhotoGallery';
 import { ScriptViewer } from '../components/media/ScriptViewer';
 import { StoryCard } from '../components/story/StoryCard';
-import { Clock, Calendar, User, ArrowLeft, ArrowUp } from 'lucide-react';
+import {
+  Clock,
+  Calendar,
+  User,
+  ArrowLeft,
+  ArrowUp,
+  FileText,
+  Download,
+  ExternalLink,
+  Layers,
+} from 'lucide-react';
 
 export const StoryDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { stories, getStoryBySlug } = useNewsroom();
+  const [viewMode, setViewMode] = useState<'article' | 'facsimile'>('article');
 
   const story = getStoryBySlug(slug || '');
 
   // Scroll to top on slug change
   useEffect(() => {
     window.scrollTo(0, 0);
+    setViewMode('article');
   }, [slug]);
 
   // Update document title and meta description per editorial brief
@@ -116,6 +128,50 @@ export const StoryDetailPage: React.FC = () => {
       const trimmed = block.trim();
       if (!trimmed) return null;
 
+      // Inline Image ![alt](url)
+      const imgMatch = trimmed.match(/^!\[(.*?)\]\((.*?)\)$/);
+      if (imgMatch) {
+        const caption = imgMatch[1];
+        const url = imgMatch[2];
+        return (
+          <figure key={idx} className="my-8">
+            <div className="overflow-hidden bg-ink-950 border border-ink-900 proof-frame rounded-xs">
+              <img
+                src={url}
+                alt={caption || story.headline}
+                className="w-full max-h-[550px] object-contain mx-auto bg-paper-200"
+                loading="lazy"
+              />
+            </div>
+            {caption && (
+              <figcaption className="flex flex-col sm:flex-row sm:items-baseline justify-between text-xs text-ink-600 font-sans mt-2 pt-2 border-t border-rule gap-2">
+                <span className="font-serif italic text-ink-800 text-sm">
+                  {caption}
+                </span>
+                <span className="font-mono text-[11px] text-ink-500 flex-shrink-0">
+                  Original Source Image
+                </span>
+              </figcaption>
+            )}
+          </figure>
+        );
+      }
+
+      // Section with star ⭐
+      if (trimmed.startsWith('⭐')) {
+        const headingText = trimmed.replace(/^⭐\s*(\*\*)?/, '').replace(/(\*\*)?$/, '');
+        return (
+          <div key={idx} className="mt-10 mb-4 pt-5 border-t-2 border-ink-900">
+            <div className="flex items-start gap-2.5">
+              <span className="text-editorial-red text-base font-bold select-none mt-1">★</span>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-ink-950 leading-snug">
+                {headingText}
+              </h3>
+            </div>
+          </div>
+        );
+      }
+
       // H3 heading
       if (trimmed.startsWith('### ')) {
         return (
@@ -145,16 +201,16 @@ export const StoryDetailPage: React.FC = () => {
         const quoteText = trimmed.replace(/^>\s*/, '').replace(/\[Insert verified quotation:\s*/, '').replace(/\]$/, '');
         return (
           <blockquote key={idx} className="pullquote my-8">
-            <p>"{quoteText}"</p>
+            <p>{quoteText}</p>
             <span className="block text-xs font-mono text-ink-600 uppercase tracking-wider mt-2">
-              — Verified Field Recording
+              — Verified Editorial Source
             </span>
           </blockquote>
         );
       }
 
       // Reporter's Transparency Note
-      if (trimmed.includes("[Reporter's") || trimmed.includes('[Fieldwork') || trimmed.includes('[Note:')) {
+      if (trimmed.includes("[Reporter's") || trimmed.includes('[Fieldwork') || trimmed.includes('[Note:') || trimmed.startsWith('[REAL PEOPLE')) {
         return (
           <aside
             key={idx}
@@ -264,112 +320,211 @@ export const StoryDetailPage: React.FC = () => {
           </div>
         </div>
 
+        {/* SOURCE PDF DOCUMENT ACCESS & FACSIMILE TOGGLE */}
+        {story.sourcePdf && (
+          <div className="my-6 p-4 sm:p-5 bg-paper-200 border-2 border-ink-950 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3">
+                <div className="w-10 h-10 bg-editorial-red text-white flex items-center justify-center rounded-xs flex-shrink-0 shadow-2xs">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] uppercase tracking-widest font-bold text-editorial-red">
+                      Original Verified Document
+                    </span>
+                    <span className="font-mono text-[10px] text-ink-500">•</span>
+                    <span className="font-mono text-[10px] text-ink-600">
+                      {Math.round(story.sourcePdf.sizeBytes / 1024)} KB • {story.sourcePdf.pageCount} Pages
+                    </span>
+                  </div>
+                  <h4 className="font-serif text-base font-bold text-ink-950 mt-0.5">
+                    Source: <code className="font-mono text-xs sm:text-sm bg-paper-100 px-1.5 py-0.5 border border-rule font-semibold">{story.sourcePdf.filename}</code>
+                  </h4>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {story.pdfPages && story.pdfPages.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setViewMode(viewMode === 'article' ? 'facsimile' : 'article')}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-colors border cursor-pointer ${
+                      viewMode === 'facsimile'
+                        ? 'bg-ink-950 text-paper-100 border-ink-950'
+                        : 'bg-paper-100 text-ink-900 border-rule hover:border-ink-950'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>{viewMode === 'facsimile' ? 'Reader Text' : 'Facsimile Pages'}</span>
+                  </button>
+                )}
+
+                <a
+                  href={story.sourcePdf.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-paper-100 hover:bg-paper-200 text-ink-900 border border-rule hover:border-ink-950 text-xs font-mono font-bold uppercase tracking-wider transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-editorial-red" />
+                  <span>Open PDF</span>
+                </a>
+
+                <a
+                  href={story.sourcePdf.url}
+                  download={story.sourcePdf.filename}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-editorial-red hover:bg-editorial-dark text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-2xs"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Share Bar */}
         <ShareBar title={story.headline} />
       </header>
 
-      {/* PRIMARY MEDIA DISPLAY (Format-dependent) */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-8 mb-10">
-        {/* CASE 1: AUDIO */}
-        {story.format === 'audio' && (
-          <div>
-            <AudioPlayer
-              src={story.media?.url || 'https://cdn.freesound.org/previews/428/428980_5121236-lq.mp3'}
-              title={story.headline}
-              episodeNumber="The Dispatch Audio"
-              byline={authorsText}
-              duration={story.media?.duration}
-              coverImage={story.cover.src}
-              scriptText={story.media?.transcript}
-            />
+      {/* CONDITIONAL DISPLAY: FACSIMILE OR ARTICLE VIEW */}
+      {viewMode === 'facsimile' && story.pdfPages && story.pdfPages.length > 0 ? (
+        <section className="max-w-4xl mx-auto px-4 sm:px-8 my-8" aria-label="Original Document Facsimile">
+          <div className="mb-6 p-4 bg-paper-200 border-l-4 border-editorial-red text-xs font-mono text-ink-800 flex flex-wrap items-center justify-between gap-3">
+            <span>
+              <strong>Facsimile Document Mode:</strong> Viewing full-fidelity rendered pages from <code className="font-bold">{story.sourcePdf?.filename}</code>.
+            </span>
+            <button
+              onClick={() => setViewMode('article')}
+              className="text-editorial-red underline font-bold hover:text-ink-950 cursor-pointer"
+            >
+              ← Return to Reader Text Mode
+            </button>
           </div>
-        )}
 
-        {/* CASE 2: VIDEO */}
-        {story.format === 'video' && (
-          <div>
-            <VideoPlayer
-              src={story.media?.url || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'}
-              poster={story.cover.src}
-              title={story.headline}
-              duration={story.media?.duration}
-              caption={story.cover.caption}
-              credit={story.cover.credit}
-              scriptText={story.media?.transcript}
-            />
+          <div className="space-y-8">
+            {story.pdfPages.map((pageImg, pIdx) => (
+              <div key={pIdx} className="bg-white border-2 border-ink-900 shadow-md p-2 sm:p-4">
+                <div className="flex items-center justify-between text-xs font-mono text-ink-600 pb-2 mb-3 border-b border-rule">
+                  <span className="font-bold uppercase text-editorial-red">DOCUMENT PAGE {pIdx + 1} OF {story.pdfPages?.length}</span>
+                  <span>{story.sourcePdf?.filename}</span>
+                </div>
+                <img
+                  src={pageImg}
+                  alt={`Page ${pIdx + 1} of ${story.headline}`}
+                  className="w-full h-auto object-contain mx-auto"
+                />
+              </div>
+            ))}
           </div>
-        )}
+        </section>
+      ) : (
+        <>
+          {/* PRIMARY MEDIA DISPLAY (Format-dependent) */}
+          <div className="max-w-4xl mx-auto px-4 sm:px-8 mb-10">
+            {/* CASE 1: AUDIO */}
+            {story.format === 'audio' && (
+              <div>
+                <AudioPlayer
+                  src={story.media?.url || 'https://cdn.freesound.org/previews/428/428980_5121236-lq.mp3'}
+                  title={story.headline}
+                  episodeNumber="The Dispatch Audio"
+                  byline={authorsText}
+                  duration={story.media?.duration}
+                  coverImage={story.cover.src}
+                  scriptText={story.media?.transcript}
+                />
+              </div>
+            )}
 
-        {/* CASE 3: PHOTO FEATURE */}
-        {story.format === 'photo' && story.media?.photos && (
-          <div>
-            <PhotoGallery photos={story.media.photos} title={story.headline} />
+            {/* CASE 2: VIDEO */}
+            {story.format === 'video' && (
+              <div>
+                <VideoPlayer
+                  src={story.media?.url || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'}
+                  poster={story.cover.src}
+                  title={story.headline}
+                  duration={story.media?.duration}
+                  caption={story.cover.caption}
+                  credit={story.cover.credit}
+                  scriptText={story.media?.transcript}
+                />
+              </div>
+            )}
+
+            {/* CASE 3: PHOTO FEATURE */}
+            {story.format === 'photo' && story.media?.photos && (
+              <div>
+                <PhotoGallery photos={story.media.photos} title={story.headline} />
+              </div>
+            )}
+
+            {/* CASE 4: ARTICLE LEAD IMAGE */}
+            {(story.format === 'long-read' || story.format === 'short') && (
+              <figure className="my-8">
+                <div className="aspect-[16/10] overflow-hidden bg-ink-950 border border-ink-900 proof-frame">
+                  <img
+                    src={story.cover.src}
+                    alt={story.cover.alt || story.headline}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <figcaption className="flex flex-col sm:flex-row sm:items-baseline justify-between text-xs text-ink-600 font-sans mt-2 pt-2 border-t border-rule gap-2">
+                  <span className="font-serif italic text-ink-800 text-sm">
+                    {story.cover.caption}
+                  </span>
+                  <span className="font-mono text-[11px] text-ink-500 flex-shrink-0">
+                    Photo: {story.cover.credit}
+                  </span>
+                </figcaption>
+              </figure>
+            )}
           </div>
-        )}
 
-        {/* CASE 4: ARTICLE LEAD IMAGE */}
-        {(story.format === 'long-read' || story.format === 'short') && (
-          <figure className="my-8">
-            <div className="aspect-[16/10] overflow-hidden bg-ink-950 border border-ink-900 proof-frame">
-              <img
-                src={story.cover.src}
-                alt={story.cover.alt || story.headline}
-                className="w-full h-full object-cover"
-              />
+          {/* ARTICLE BODY */}
+          <main className="max-w-3xl mx-auto px-4 sm:px-8">
+            <div className="prose-editorial">
+              {renderFormattedBody(story.body)}
             </div>
-            <figcaption className="flex flex-col sm:flex-row sm:items-baseline justify-between text-xs text-ink-600 font-sans mt-2 pt-2 border-t border-rule gap-2">
-              <span className="font-serif italic text-ink-800 text-sm">
-                {story.cover.caption}
-              </span>
-              <span className="font-mono text-[11px] text-ink-500 flex-shrink-0">
-                Photo: {story.cover.credit}
-              </span>
-            </figcaption>
-          </figure>
-        )}
-      </div>
 
-      {/* ARTICLE BODY */}
-      <main className="max-w-3xl mx-auto px-4 sm:px-8">
-        <div className="prose-editorial">
-          {renderFormattedBody(story.body)}
-        </div>
+            {/* SCRIPT / TRANSCRIPT SECTION (If media story has transcript) */}
+            {story.media?.transcript && (story.format === 'audio' || story.format === 'video') && (
+              <ScriptViewer
+                scriptText={story.media.transcript}
+                storyTitle={story.headline}
+                mediaType={story.format === 'audio' ? 'podcast' : 'video-report'}
+                duration={story.media.duration}
+              />
+            )}
 
-        {/* SCRIPT / TRANSCRIPT SECTION (If media story has transcript) */}
-        {story.media?.transcript && (story.format === 'audio' || story.format === 'video') && (
-          <ScriptViewer
-            scriptText={story.media.transcript}
-            storyTitle={story.headline}
-            mediaType={story.format === 'audio' ? 'podcast' : 'video-report'}
-            duration={story.media.duration}
-          />
-        )}
+            {/* SOURCES & REFERENCES */}
+            <SourcesList sources={story.sources || []} />
 
-        {/* SOURCES & REFERENCES */}
-        <SourcesList sources={story.sources || []} />
+            {/* EDITORIAL CREDITS */}
+            <CreditsContributions contributors={story.authors} storyId={story.id} />
 
-        {/* EDITORIAL CREDITS */}
-        <CreditsContributions contributors={story.authors} storyId={story.id} />
+            {/* BOTTOM STORY NAV */}
+            <div className="flex items-center justify-between pt-8 mt-12 border-t-2 border-ink-900 text-xs font-mono">
+              <Link
+                to={`/section/${story.category.toLowerCase()}`}
+                className="flex items-center gap-1.5 text-ink-800 hover:text-editorial-red transition-colors uppercase font-bold"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to {story.category}</span>
+              </Link>
 
-        {/* BOTTOM STORY NAV */}
-        <div className="flex items-center justify-between pt-8 mt-12 border-t-2 border-ink-900 text-xs font-mono">
-          <Link
-            to={`/section/${story.category.toLowerCase()}`}
-            className="flex items-center gap-1.5 text-ink-800 hover:text-editorial-red transition-colors uppercase font-bold"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to {story.category}</span>
-          </Link>
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="flex items-center gap-1.5 text-ink-800 hover:text-editorial-red transition-colors uppercase font-bold cursor-pointer"
+              >
+                <span>Top of Article</span>
+                <ArrowUp className="w-4 h-4" />
+              </button>
+            </div>
+          </main>
+        </>
+      )}
 
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex items-center gap-1.5 text-ink-800 hover:text-editorial-red transition-colors uppercase font-bold cursor-pointer"
-          >
-            <span>Top of Article</span>
-            <ArrowUp className="w-4 h-4" />
-          </button>
-        </div>
-      </main>
 
       {/* RELATED STORIES RECOMMENDATIONS */}
       {relatedStories.length > 0 && (

@@ -192,8 +192,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               <CheckCircle2 className="w-4 h-4 text-editorial-red" />
               Accompanying Video Report Script & Shot List
             </h4>
-            <span className="text-[10px] uppercase font-mono tracking-wider text-editorial-red">
-              Required Submission Asset
+            <span className="text-[10px] uppercase font-mono tracking-wider text-ink-500 font-semibold">
+              Broadcast Script
             </span>
           </div>
           <div className="bg-paper-100 p-4 font-mono text-xs text-ink-800 whitespace-pre-line leading-relaxed max-h-80 overflow-y-auto border border-rule">

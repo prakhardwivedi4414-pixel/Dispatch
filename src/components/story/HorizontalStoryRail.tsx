@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Story } from '../../types';
 import { ArrowRight, Play, Headphones, Camera, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
@@ -13,33 +13,33 @@ export const HorizontalStoryRail: React.FC<HorizontalStoryRailProps> = ({ storie
   const [scrollProgress, setScrollProgress] = useState(0);
   const [maxScrollDistance, setMaxScrollDistance] = useState(0);
   const [isMobileOrReducedMotion, setIsMobileOrReducedMotion] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(() => (typeof window !== 'undefined' ? window.innerWidth : 1200));
 
   // Filter published stories
   const displayStories = stories.filter(s => s.status === 'published');
   const count = displayStories.length;
 
+  const updateDimensions = useCallback(() => {
+    if (!trackRef.current) return;
+    const currentViewportW = window.innerWidth;
+    setViewportWidth(currentViewportW);
+    const isMobile = currentViewportW < 1024;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setIsMobileOrReducedMotion(isMobile || prefersReduced);
+
+    const trackWidth = trackRef.current.scrollWidth;
+    // Provide 80px breathing room after the last card
+    const overflow = Math.max(0, trackWidth - currentViewportW + 80);
+    setMaxScrollDistance(overflow);
+  }, []);
+
   useEffect(() => {
-    const checkViewportAndMotion = () => {
-      const isMobile = window.innerWidth < 1024;
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      setIsMobileOrReducedMotion(isMobile || prefersReduced);
-    };
-
-    checkViewportAndMotion();
-    window.addEventListener('resize', checkViewportAndMotion);
-
-    // Measure track width to determine exact horizontal travel so final card is comfortably in view
-    const updateDimensions = () => {
-      if (!trackRef.current) return;
-      const trackWidth = trackRef.current.scrollWidth;
-      const viewportWidth = window.innerWidth;
-      // Ensure the last card has at least 80px right breathing room
-      const overflow = Math.max(0, trackWidth - viewportWidth + 80);
-      setMaxScrollDistance(overflow);
-    };
-
     updateDimensions();
-    const resizeObserver = new ResizeObserver(updateDimensions);
+    window.addEventListener('resize', updateDimensions);
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateDimensions();
+    });
     if (trackRef.current) {
       resizeObserver.observe(trackRef.current);
     }
@@ -49,9 +49,13 @@ export const HorizontalStoryRail: React.FC<HorizontalStoryRailProps> = ({ storie
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          if (!sectionRef.current) return;
+          if (!sectionRef.current) {
+            ticking = false;
+            return;
+          }
           const rect = sectionRef.current.getBoundingClientRect();
           const totalDistance = rect.height - window.innerHeight;
+
           if (totalDistance <= 0) {
             setScrollProgress(0);
           } else {
@@ -66,13 +70,14 @@ export const HorizontalStoryRail: React.FC<HorizontalStoryRailProps> = ({ storie
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
 
     return () => {
-      window.removeEventListener('resize', checkViewportAndMotion);
+      window.removeEventListener('resize', updateDimensions);
       window.removeEventListener('scroll', handleScroll);
       resizeObserver.disconnect();
     };
-  }, [count]);
+  }, [count, updateDimensions]);
 
   const getFormatIcon = (format: string) => {
     switch (format) {
@@ -109,7 +114,7 @@ export const HorizontalStoryRail: React.FC<HorizontalStoryRailProps> = ({ storie
     const windowTop = window.scrollY;
     const sectionTop = windowTop + rect.top;
     const totalDistance = rect.height - window.innerHeight;
-    const stepAmount = totalDistance * 0.35;
+    const stepAmount = Math.max(totalDistance * 0.35, 250);
 
     const newTargetScroll = direction === 'right'
       ? Math.min(windowTop + stepAmount, sectionTop + totalDistance)
@@ -206,20 +211,26 @@ export const HorizontalStoryRail: React.FC<HorizontalStoryRailProps> = ({ storie
     );
   }
 
-  // DESKTOP: CONTROLLED VERTICAL-TO-HORIZONTAL PINNED RAIL
-  // Section height scales with scroll distance plus one viewport
-  const railHeightVh = 140;
-  const horizontalOffset = -scrollProgress * maxScrollDistance;
+  // DESKTOP: PROPORTIONAL PINNED RAIL (NEVER TRAPS THE USER)
+  // If maxScrollDistance is negligible (< 80px), all cards comfortably fit the screen:
+  // Render as an elegant horizontal flex band without any pinning!
+  const needsPinning = maxScrollDistance > 80;
+  // Calculate section height strictly based on overflow distance needed:
+  // 1 viewport height + maxScrollDistance + 120px buffer for a gentle release into the next section
+  const extraScrollDistance = needsPinning ? maxScrollDistance + 140 : 0;
+  const horizontalOffset = needsPinning ? -scrollProgress * maxScrollDistance : 0;
 
   return (
     <section
       ref={sectionRef}
-      style={{ height: `${railHeightVh}vh` }}
+      style={{
+        height: needsPinning ? `calc(100vh + ${extraScrollDistance}px)` : 'auto',
+      }}
       className="relative border-b-2 border-ink-950 bg-paper-100"
       aria-label="Curated Featured Story Track"
     >
       {/* Sticky viewport window */}
-      <div className="sticky top-14 h-[calc(100vh-3.5rem)] w-full overflow-hidden flex flex-col justify-between py-6">
+      <div className={`${needsPinning ? 'sticky top-14 h-[calc(100vh-3.5rem)]' : 'relative py-12'} w-full overflow-hidden flex flex-col justify-between py-6`}>
         
         {/* Rail Header with Manual Controls & Progress Indicator */}
         <div className="max-w-7xl w-full mx-auto px-8 flex items-end justify-between pb-3 border-b border-rule z-10 flex-shrink-0">
@@ -237,68 +248,73 @@ export const HorizontalStoryRail: React.FC<HorizontalStoryRailProps> = ({ storie
 
           <div className="flex items-center gap-4 text-xs font-mono text-ink-600">
             {/* Visual Controls: Left/Right Manual Step Buttons */}
-            <div className="flex items-center gap-1 bg-paper-50 border border-rule p-1 shadow-2xs">
-              <button
-                type="button"
-                onClick={() => handleManualStep('left')}
-                className="p-1 hover:bg-paper-200 text-ink-800 hover:text-editorial-red transition-colors"
-                title="Scroll rail backwards"
-                aria-label="Previous rail story"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleManualStep('right')}
-                className="p-1 hover:bg-paper-200 text-ink-800 hover:text-editorial-red transition-colors"
-                title="Scroll rail forwards"
-                aria-label="Next rail story"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="hidden sm:flex items-center gap-2">
-              <div className="w-24 h-1.5 bg-paper-200 border border-rule overflow-hidden">
-                <div
-                  className="h-full bg-editorial-red transition-all duration-75"
-                  style={{ width: `${Math.round(scrollProgress * 100)}%` }}
-                />
+            {needsPinning && (
+              <div className="flex items-center gap-1 bg-paper-50 border border-rule p-1 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => handleManualStep('left')}
+                  className="p-1 hover:bg-paper-200 text-ink-800 hover:text-editorial-red transition-colors"
+                  title="Scroll rail backwards"
+                  aria-label="Previous rail story"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleManualStep('right')}
+                  className="p-1 hover:bg-paper-200 text-ink-800 hover:text-editorial-red transition-colors"
+                  title="Scroll rail forwards"
+                  aria-label="Next rail story"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
-              <span className="font-mono text-[11px] text-ink-500">{Math.round(scrollProgress * 100)}%</span>
-            </div>
+            )}
+
+            {needsPinning && (
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="w-24 h-1.5 bg-paper-200 border border-rule overflow-hidden">
+                  <div
+                    className="h-full bg-editorial-red transition-all duration-75"
+                    style={{ width: `${Math.round(scrollProgress * 100)}%` }}
+                  />
+                </div>
+                <span className="font-mono text-[11px] text-ink-500">{Math.round(scrollProgress * 100)}%</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Horizontal Track Canvas */}
-        <div className="relative w-full flex-grow flex items-center overflow-hidden my-auto">
+        <div className="relative w-full flex-grow flex items-center overflow-hidden my-auto py-4">
           <div
             ref={trackRef}
             className="flex items-center gap-8 px-12 will-change-transform"
             style={{
               transform: `translate3d(${horizontalOffset}px, 0, 0)`,
+              transition: needsPinning ? 'none' : 'none',
             }}
           >
             {displayStories.map((story, index) => {
-              // Alternating large-small deliberate rhythm
+              // Alternating deliberate editorial rhythm
               const isLarge = index % 2 === 0;
-              const cardWidth = isLarge ? 440 : 360;
+              const cardWidth = isLarge ? 430 : 360;
               const authorsText = story.authors?.map(a => a.name).join(', ') || 'The Dispatch';
               const storyUrl = `/story/${story.slug}`;
 
               // Parabolic trajectory from lower-right viewport
-              const cardApproxX = horizontalOffset + index * 420;
-              const normalizedPos = (cardApproxX + 180) / (window.innerWidth || 1200);
-              const isEnteringFromRight = normalizedPos > 0.7;
-              const curveY = isEnteringFromRight ? Math.min((normalizedPos - 0.7) * 35, 25) : 0;
-              const tiltDeg = isEnteringFromRight ? Math.min((normalizedPos - 0.7) * 2, 1.5) : 0;
+              const cardApproxX = horizontalOffset + index * 410;
+              const normalizedPos = (cardApproxX + 200) / (viewportWidth || 1200);
+              const isEnteringFromRight = normalizedPos > 0.75;
+              const curveY = isEnteringFromRight ? Math.min((normalizedPos - 0.75) * 30, 24) : 0;
+              const tiltDeg = isEnteringFromRight ? Math.min((normalizedPos - 0.75) * 2, 1.5) : 0;
 
               return (
                 <article
                   key={story.id}
                   style={{
                     width: `${cardWidth}px`,
-                    height: '470px',
+                    height: '465px',
                     transform: `translate3d(0, ${curveY}px, 0) rotate(${tiltDeg}deg)`,
                   }}
                   className="flex-shrink-0 bg-paper-50 border border-ink-950 p-6 flex flex-col justify-between shadow-md transition-shadow duration-150 hover:shadow-xl group"
@@ -363,9 +379,10 @@ export const HorizontalStoryRail: React.FC<HorizontalStoryRailProps> = ({ storie
         {/* Rail Footer Navigation Hint */}
         <div className="max-w-7xl w-full mx-auto px-8 pt-3 border-t border-rule flex items-center justify-between text-xs font-mono text-ink-500 flex-shrink-0">
           <span>Explore all dispatches in sequence</span>
-          <span>{scrollProgress < 0.95 ? 'Scroll down to continue' : 'End of sequence'}</span>
+          <span>{scrollProgress < 0.92 ? 'Scroll down to continue' : 'End of sequence — continuous scroll below'}</span>
         </div>
       </div>
     </section>
   );
 };
+

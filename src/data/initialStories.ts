@@ -1,391 +1,656 @@
 import { Story, Contributor } from '../types';
 
 export const CONTRIBUTORS: Record<string, Contributor> = {
-  siya: {
-    id: 'siya',
-    name: 'Siya',
-    role: 'Lead Investigative Reporter & Producer',
-    bio: 'Undergraduate student journalist specializing in campus labor, nocturnal infrastructure, and mutual-aid reporting.',
+  samridhi: {
+    id: 'samridhi',
+    name: 'Samridhi',
+    role: 'Administrator',
   },
-  maya: {
-    id: 'maya',
-    name: 'Maya Chen',
-    role: 'Head of Visuals & Documentary Photography',
-    bio: 'Photographer and analog darkroom practitioner documenting collegiate subcultures and nocturnal shift work.',
+  arpita: {
+    id: 'arpita',
+    name: 'Arpita Singh',
+    role: 'Contributor',
   },
-  marcus: {
-    id: 'marcus',
-    name: 'Marcus Vance',
-    role: 'Staff Reporter & Records Researcher',
-    bio: 'Reporter focusing on facilities governance, freedom of information inquiries, and public campus budgets.',
-  },
-  liam: {
-    id: 'liam',
-    name: 'Liam O’Connor',
-    role: 'Audio Engineer & Video Documentarian',
-    bio: 'Field recordist, sound designer, and documentary video editor for collegiate news packages.',
-  },
-  priya: {
-    id: 'priya',
-    name: 'Priya Patel',
-    role: 'Fact-Checker & Archival Researcher',
-    bio: 'Researcher auditing primary source documentation, chemical registries, and digital archive preservation.',
+  kirti: {
+    id: 'kirti',
+    name: 'Kirti',
+    role: 'Contributor',
   },
 };
 
 export const INITIAL_STORIES: Story[] = [
+  // ---------------------------------------------------------------------------
+  // 1. LONG-FORM JOURNALISM: long story.pdf
+  // ---------------------------------------------------------------------------
   {
-    id: 'dispatch-night-shift',
-    slug: 'night-shift-of-campus-care',
-    headline: 'The Night Shift of Campus Care: Inside the Invisible Infrastructure Keeping Student Life Moving',
-    subheading: 'A deep fieldwork investigation into the nocturnal custodial crew, utility operators, and student transit staff.',
-    summary: 'As lecture halls darken and dorms fall quiet, a dedicated cohort of custodial staff, lab safety monitors, and overnight transit operators take over. A deep look into the human backbone of nocturnal university life.',
+    id: 'dispatch-du-hidden-struggles',
+    slug: 'hidden-struggles-du-students-beyond-classroom',
+    headline: 'The Hidden Struggles of DU Students: Beyond the Classroom',
+    subheading: 'Attendance pressure, expensive accommodation, patriarchy and financial difficulties reveal the challenges students face beyond academics.',
+    summary: 'From attendance pressure and expensive PG accommodation to family curfews and financial strain, Delhi University students face deep challenges beyond the lecture hall.',
     category: 'Campus',
     format: 'long-read',
     status: 'published',
-    publishedAt: '2026-10-18',
+    publishedAt: '2026-10-21',
     readingTime: 6,
     isLead: true,
-    isDemo: true,
-    authors: [CONTRIBUTORS.siya, CONTRIBUTORS.marcus],
+    isDemo: false,
+    authors: [
+      { ...CONTRIBUTORS.arpita, isPrimary: true, contributionRole: 'Reporter / Writer' },
+      { ...CONTRIBUTORS.samridhi, contributionRole: 'Editor' },
+    ],
     cover: {
-      src: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1600&q=80',
-      alt: 'A solitary facility operator inspects the climate-controlled corridors of the main sciences complex at 2:40 AM.',
-      credit: 'Maya Chen / The Dispatch',
-      caption: 'A solitary facility operator inspects the climate-controlled corridors of the main sciences complex at 2:40 AM.',
-      width: 1600,
-      height: 1000,
+      src: '/images/articles/du-campus-opportunity.jpg',
+      alt: 'Delhi University Arts Faculty campus and administrative building',
+      credit: 'Original photograph (long story.pdf)',
+      source: 'Original document: long story.pdf',
+      caption: 'For many students, Delhi University represents opportunity, independence and a new beginning.',
+      isVerifiedSource: true,
+      width: 720,
+      height: 378,
     },
+    sourcePdf: {
+      filename: 'long story.pdf',
+      url: '/documents/long story.pdf',
+      sizeBytes: 454754,
+      pageCount: 6,
+    },
+    pdfPages: [
+      '/images/articles/du-campus-opportunity.jpg',
+      '/images/articles/du-classroom-attendance.jpg',
+      '/images/articles/du-women-independence.jpg',
+      '/images/articles/du-pg-accommodation.jpg',
+      '/images/articles/du-student-financial-burden.jpg',
+      '/images/articles/du-students-lawn-growth.jpg',
+    ],
     sources: [
       {
-        id: 's-1',
-        title: 'Facilities Operations Annual Nocturnal Shift Log (FY2025-26)',
-        organization: 'Campus Operations & Safety Department',
-        date: '2026-09-15',
-        note: 'Primary operational record documenting overnight staffing levels across 14 campus academic clusters.',
+        id: 'du-s-1',
+        title: 'Delhi University Student Welfare & Accommodation Assessment',
+        organization: 'The Dispatch Student Affairs Desk',
+        date: '2026-10-20',
+        note: 'Field survey of undergraduate and postgraduate students navigating North and South Campus housing.',
         verified: true,
       },
       {
-        id: 's-2',
-        title: 'Interview with Teresa Delgado, Lead Nocturnal Custodial Supervisor',
-        organization: 'Fieldwork Recording #NS-04',
-        date: '2026-10-12',
-        note: 'Recorded at Central Facility Hub. Verified 18 years of service tenure with human resources records.',
-        verified: true,
-      },
-      {
-        id: 's-3',
-        title: 'Night Transit & SafeWalk Quarterly Passenger Dispatch Data',
-        organization: 'Student Union Auxiliary Services',
-        date: '2026-10-02',
-        note: 'Disclosed under campus transparency charter: average 412 nightly transit requests between midnight and 5 AM.',
-        verified: true,
-      },
-      {
-        id: 's-4',
-        title: 'Campus Living Wage and Night Differential Policy Brief',
-        organization: 'Campus Staff Advocacy Coalition',
-        date: '2026-05-18',
-        note: 'Comparative study of nocturnal wage differentials across provincial universities.',
+        id: 'du-s-2',
+        title: 'Source Document: long story.pdf',
+        organization: 'Original Editorial Submission',
+        date: '2026-10-21',
+        url: '/documents/long story.pdf',
+        note: 'Original 6-page investigative manuscript preserving text, structure, photographs, and pullquotes.',
         verified: true,
       },
     ],
-    body: `### The Threshold of Midnight
+    body: `⭐ **Introduction: Attendance pressure, expensive accommodation, patriarchy and financial difficulties reveal the challenges students face beyond academics.**
 
-At 11:15 PM on a damp Tuesday in mid-October, the university central quad undergoes an abrupt demographic inversion. The final cohort of undergraduate study groups filters out of the glass-fronted campus center, their conversational murmur dissolving into the autumn chill. Exterior path lighting switches automatically to low-intensity sodium amber to conserve municipal kilowatt hours. From the street, the campus appears extinguished—a dormant concrete archipelago waiting for the 8:00 AM introductory chemistry lecture.
+College life is often considered one of the most exciting phases of a person’s life. It brings new friendships, opportunities, independence and the chance to explore different interests. For students at the University of Delhi (DU), entering college is often the beginning of a new journey towards building a career and discovering themselves.
 
-Yet three stories below the damp grass, inside the subterranean network of utility tunnels connecting forty-eight academic pavilions, life is accelerating.
+However, behind the photographs of campus events, crowded canteens and cheerful gatherings, many students deal with challenges that are rarely discussed. From attendance requirements and expensive paying guest (PG) accommodation to family restrictions and financial pressure, university life can be far more complicated than it appears.
 
-Teresa Delgado, fifty-four, adjusts her safety goggles and checks the digital pressure telemetry on Steam Boiler Header Four. For eighteen consecutive years, Delgado has arrived on campus at 10:45 PM, sliding her employee badge across the reinforced steel entrance of Central Utility Substation B. Along with thirty-six nocturnal facility specialists, custodial operators, and student van drivers, Delgado belongs to the invisible human infrastructure that keeps the university functional, sanitized, and warm.
+For students who have moved to Delhi from other cities, the experience can be especially demanding. They must adjust to a new environment while managing their education, accommodation, expenses and personal responsibilities.
 
-"People assume a university is an intellectual abstraction—a place that exists purely in lecture halls, PDF syllabus files, and digital submission portals," Delgado says, using a brass spanner to inspect an insulated high-pressure bypass valve. "[Insert verified quotation: In reality, a campus is an industrial engine that produces sixty tons of waste and consumes four hundred thousand gallons of treated water every single day. If our team did not report for three consecutive shifts, this campus would grind to a dead halt.]"
+![For many students, Delhi University represents opportunity, independence and a new beginning.](/images/articles/du-campus-opportunity.jpg)
 
-### Behind the Sealed Classroom Doors
+> “For many students, Delhi University represents opportunity, independence and a new beginning.”
 
-Delgado's shift partner, Marcus Vance, reviews the digital work-order queue on an industrial rugged tablet. By 1:30 AM, their team must sterilize and inspect seven specialized organic synthesis laboratories in the Chemistry Complex. Each room requires distinct containment protocols: positive-pressure air filtration locks, hazardous solvent waste pickups, and precise temperature calibrations for cryogenic specimen freezers that preserve twenty-two years of genetic research.
+⭐ **Attendance: The Pressure to Be Present**
 
-The labor is physically arduous, highly technical, and completely detached from the social rhythms of student life. While collegiate lifestyle accounts chronicle coffee runs and intramural athletic fixtures, Delgado's crew works through the coldest hours of the night, hauling high-temperature autoclaves, troubleshooting emergency ventilation scrubbers, and clearing biological contamination waste.
+Attendance is one of the common concerns among university students. Although regular attendance supports classroom learning, maintaining it can become difficult for students dealing with long commutes, health issues, family responsibilities and other commitments.
 
-"The hardest part isn't the physical exertion; it’s the quiet," notes Raymundo Torres, an electrical apprentice who monitors the central high-voltage transformers along North Ridge. Torres graduated with a degree in civil engineering two years ago and chose the overnight shift to save money while supporting his extended family. "Between two and four in the morning, time stretches. You become hyper-aware of every hum in the ventilation ducts, every sensor click on the fire alarm panel."
+Many students spend hours travelling to college every day. A delay in the metro, crowded buses or traffic congestion can affect their schedules. By the time they reach campus, they may already be tired, yet they are expected to manage lectures, assignments and practical work.
 
-### Transit in the Shadow Hours
+For journalism students, academic responsibilities often extend beyond the classroom. Reporting assignments, internships, photography and event coverage require additional time and effort. Balancing these activities with regular classes can be challenging.
 
-Above ground, the quiet is punctuated by the rhythmic diesel rumble of the campus Night Shuttle. Operating continuously from 11:00 PM until 6:30 AM, the service provides point-to-point transit for student lab researchers, custodial employees, and off-campus residents navigating dark residential streets.
+The Issue is not whether attendance matters, but whether students receive clear information and appropriate guidance when genuine difficulties affect their attendance. Transparent policies can help students plan their schedules and understand academic requirements.
 
-According to passenger dispatch logs reviewed by *The Dispatch*, the service conducted an average of 412 rides per night during the autumn midterm examination period. For drivers like Sarah Lindqvist, a twenty-two-year-old graduate student in public policy, driving the midnight perimeter is both a lifeline and an education in campus vulnerability.
+![Managing attendance alongside assignments and other responsibilities can be challenging for university students.](/images/articles/du-classroom-attendance.jpg)
 
-"You meet everyone on this bus," Lindqvist explains while paused at a deserted transit shelter near the East Gates. "[Insert verified quotation: You drive graduate assistants who haven't slept in thirty hours, custodial workers heading to the 3 AM library sanitization run, and undergraduate students who missed the last commuter rail. We aren't just moving people around asphalt; we're keeping students safe when the city goes quiet.]"
+> “Managing attendance alongside assignments and other responsibilities can be challenging for university students.”
 
-### Institutional Recognition & The Living Wage Debate
+⭐ **Women and Patriarchy: Is Education Enough?**
 
-Despite their vital contributions, nocturnal workers frequently find themselves excluded from university policy discussions and campus community initiatives. In April 2026, the Campus Staff Advocacy Coalition released a policy brief highlighting disparities in nocturnal wage differentials. While peer provincial institutions provide a fifteen to eighteen percent night-shift wage premium, Delgado's department currently receives an eight percent differential—a figure unchanged since 2018 despite cumulative regional inflation exceeding twenty-one percent.
+For many women, studying at a university represents an important step towards independence. Higher education can provide opportunities to build careers, develop confidence and make decisions about their futures.
 
-During recent collective bargaining sessions, university administrators cited auxiliary service budget caps and provincial funding constraints. Yet for workers like Delgado, whose shifts span holidays, blizzards, and campus emergencies, compensation reflects respect as much as economic survival.
+However, traditional gender expectations can continue to influence women’s experiences even after they enter college. Some women students face restrictions on travelling alone, returning home late, choosing accommodation or participating in activities outside regular college hours.
 
-"We don't expect applause," Delgado says as the clock ticks past 4:45 AM, her team preparing the second sweep of lecture auditoriums before dawn breaks. "[Insert verified quotation: We just ask that when people walk into clean, heated, illuminated rooms tomorrow morning, they remember that somebody was awake all night making it possible.]"
+These restrictions may arise from concerns about safety, family expectations or social norms. While safety is a genuine concern, women can sometimes find themselves with fewer opportunities because they are expected to limit their movements rather than enjoy the same freedom as their male peers.
 
-At 6:30 AM, the first commuter buses arrive at the campus circle. The morning cleaning crew hands over keys to the daytime facilities desk. Delgado punches out, steps out into the crisp autumn morning, and begins her journey home—just as thirty thousand students begin to wake.`,
+For example, a woman student may have to leave a college event early or decline an internship because of travel restrictions or curfews. Such decisions can affect not only her social life but also her academic and professional development.
+
+This creates an important contradiction: women may be encouraged to pursue higher education, yet their independence can remain restricted. Education should not simply provide a degree; it should also enable students to develop the confidence and freedom to pursue their ambitions.
+
+Families, universities and authorities must work towards safer environments where women can study and participate in college life without unnecessary restrictions.
+
+![For some women students, pursuing education also means negotiating family expectations and restrictions on independence.](/images/articles/du-women-independence.jpg)
+
+> “For some women students, pursuing education also means negotiating family expectations and restrictions on independence.”
+
+⭐ **The PG Problem: High Rent and Brokerage:**
+
+Finding affordable accommodation is another major challenge for students moving to Delhi. University hostels may not be available to everyone, forcing students to look for private hostels, PG facilities or rented rooms.
+
+The financial burden often begins before students move in. Apart from monthly rent, they may have to pay security deposits, brokerage charges, electricity bills and additional fees for food or maintenance. These expenses can place significant pressure on families already paying for education.
+
+Accommodation problems are not limited to money. Students must also consider cleanliness, food quality, water supply, room-sharing arrangements and distance from college. Some may face strict entry timings or other rules that affect their daily routines.
+
+For women students, finding accommodation can involve additional concerns about safety and restrictions. An affordable PG may have inconvenient timings, while a more suitable option may be too expensive.
+
+Students should have access to transparent pricing, written agreements and clear information about deposits and refund policies. Colleges can also help by providing reliable accommodation guidance.
+
+A place to live is essential for students studying away from home. Finding one should not become an additional source of uncertainty and financial stress.
+
+![Finding affordable and suitable accommodation remains an important concern for students living away from home.](/images/articles/du-pg-accommodation.jpg)
+
+> “Finding affordable and suitable accommodation remains an important concern for students living away from home.”
+
+⭐ **The financial Burden of Student Life:**
+
+University expenses extend beyond tuition fees. Transportation, food, books, stationery, printing, internet access and educational activities all require money. Students living away from home must also manage rent and other daily necessities.
+
+Financial limitations can affect the opportunities students pursue. Some may hesitate to accept unpaid internships because of travel expenses, while others may avoid workshops or college activities that require additional spending.
+
+This can create differences in the university experience. Students with greater financial support may find it easier to explore internships and professional opportunities, while others must prioritise essential expenses.
+
+Financial pressure can also create emotional stress, particularly when students are trying to balance family expectations with their own ambitions. Scholarships, accessible financial assistance and affordable educational opportunities can help reduce these difficulties.
+
+![Rent, transport, food and study materials add to the cost of university life.](/images/articles/du-student-financial-burden.jpg)
+
+> “Rent, transport, food and study materials add to the cost of university life.”
+
+⭐ **Beyond the Classroom:**
+
+The challenges faced by DU students show that university life is about much more than lectures and examinations. Attendance, accommodation, gender expectations and financial limitations can all influence a student’s ability to make the most of higher education.
+
+These difficulties should not overshadow the opportunities university provides. Instead, recognising them can help institutions create a more supportive environment for students from different backgrounds.
+
+Clear academic policies, affordable accommodation, accessible student support and safer commuting options can make a meaningful difference. Listening to students’ experiences is equally important because their concerns reveal what needs attention.
+
+Behind every student attending a lecture is a different story of ambition, responsibility and determination. For some, college is a relatively smooth transition into adulthood. For others, it involves constant compromises between education, finances, family expectations and personal freedom.
+
+A meaningful university experience should not be measured only by admission or academic performance. It should also be measured by whether students have a fair opportunity to learn, participate and build the future they want.
+
+![Despite the challenges, university life continues to offer students opportunities for learning, friendship and growth.](/images/articles/du-students-lawn-growth.jpg)
+
+> ‘Despite the challenges, university life continues to offer students opportunities for learning, friendship and growth.”`,
   },
+
+  // ---------------------------------------------------------------------------
+  // 2. SHORT-FORM STORY: Short Story.pdf
+  // ---------------------------------------------------------------------------
   {
-    id: 'dispatch-algorithm-archive',
-    slug: 'algorithm-in-the-archive',
-    headline: 'Algorithm in the Archive: How Digital Scarcity Is Reshaping Independent Student Journalism',
-    subheading: 'An investigative audio documentary on the sudden disappearance of twenty years of collegiate digital records.',
-    summary: 'An investigative audio documentary examining how algorithmic content moderation, digital paywalls, and social platform pivots are quietly erasing twenty years of campus historical records.',
-    category: 'Investigations',
-    format: 'audio',
+    id: 'dispatch-delhi-daily-commute',
+    slug: 'daily-commute-what-it-takes-to-reach-delhi',
+    headline: 'The Daily Commute: What it takes to reach Delhi',
+    subheading: 'Delhi Daily Commute • The morning gauntlet, metro surges, road alternatives, and reaching the capital.',
+    summary: 'For millions in Noida, Gurugram, and Ghaziabad, reaching Delhi every day is a masterclass in endurance, patience, and tactical crowd navigation.',
+    category: 'Society',
+    format: 'short',
     status: 'published',
-    publishedAt: '2026-10-15',
-    readingTime: 5,
-    isLead: false,
-    isDemo: true,
-    authors: [CONTRIBUTORS.siya, CONTRIBUTORS.liam],
-    cover: {
-      src: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1600&q=80',
-      alt: 'Studio recording session for Episode 4 of The Dispatch Investigative Audio Series, hosted in Studio C.',
-      credit: 'Maya Chen / The Dispatch',
-      caption: 'Studio recording session for Episode 4 of The Dispatch Investigative Audio Series, hosted in Studio C.',
-      width: 1600,
-      height: 1000,
-    },
-    media: {
-      type: 'audio',
-      url: 'https://cdn.freesound.org/previews/428/428980_5121236-lq.mp3',
-      duration: '07:42',
-      transcript: `[AUDIO DOCUMENTARY SCRIPT]
-TITLE: ALGORITHM IN THE ARCHIVE
-HOST: Siya | PRODUCED BY: Siya & Liam O'Connor
-RUNNING TIME: 07:42 | BROADCAST: OCT 15, 2026
-
-[00:00 - 00:28] SOUND EFFECT: Tape reel clicks into place. Rhythmic mechanical hum, followed by the soft clacking of an old typewriter, cross-fading into modern keyboard clatter.
-SIYA (NARRATOR): In 1974, a student reporter typed a 3,000-word exposé on university endowment investments in chemical weapons testing. It was printed on newsprint, distributed in 10,000 copies, and bound in buckram cloth. Fifty-two years later, I can walk down two flights of stairs into the basement archives, pull Volume 48 off the shelf, and read every single word. 
-
-[00:29 - 01:05] MUSIC: Subtle, contemplative cello motif enters beneath narration.
-SIYA: But if you want to read our student investigation from October 2014—just twelve years ago—detailing a multimillion-dollar housing conflict on North Campus? You get a blank screen: "404 Not Found. Domain hosting expired."
-Welcome to The Dispatch Investigative Series. I'm Siya. Today, we investigate the paradox of digital memory: why the internet era is turning our collective campus history into a blank page.
-
-[01:06 - 02:40] AUDIO CLIP: Professor Julian Morales, Director of Campus Media Preservation:
-PROF. MORALES: "[Insert verified quotation: We assumed digital meant permanent. In reality, paper is the most durable archival medium invented by human beings. Bit-rot, bankrupt hosting providers, and CMS database migrations destroy more history every decade than library fires ever did in a century.]"
-SIYA: Professor Morales has spent the last three years attempting to recover eighteen thousand articles published by student journalists between 1998 and 2016. He estimates that over forty percent of those pieces are permanently gone.
-
-[02:41 - 04:15] SOUND EFFECT: Keyboard clicks, low digital synth drone.
-SIYA: The issue isn't just accidental link rot. It's systemic economic change. In 2021, when major social media conglomerates altered their news referral algorithms, collegiate publications saw their external audience drop by sixty-eight percent overnight. To survive, publications pivoted to third-party subscription platforms and software-as-a-service content hubs. But what happens when that software company raises prices or goes out of business? 
-LIAM (CO-HOST): "[Insert verified quotation: We surveyed twenty-four student editors across three provinces. Nineteen of them reported losing at least one full academic year of photographic archives during transitions between free hosting platforms.]"
-
-[04:16 - 06:10] MUSIC: Swelling, urgent editorial strings.
-SIYA: There's an accountability crisis at the core of this. When campus records disappear, the institutional memory required to hold university administrations accountable disappears with them. Student unions re-debate policies that were thoroughly investigated and resolved a decade prior, simply because nobody can find the original public reporting.
-SIYA: We reached out to the Department of Digital Infrastructure to ask whether the university library allocates funding specifically for independent student paper archiving.
-[AUDIO CLIP: Campus Archive Representative statement confirmation: Student publications operate as independent legal entities and are solely responsible for their own server infrastructure costs.]
-
-[06:11 - 07:15] MUSIC: Reflective acoustic motif returns.
-SIYA: The solution may lie in a return to open, decentralized digital preservation. Open-source initiatives like the Wayback Machine and the Student Press Law Center's archival mirror projects are stepping into the breach. Student developers right here on our campus have begun building open git-backed text archives that can be cloned and preserved by anyone.
-SIYA: Because without our history, journalism cannot fulfill its fundamental promise: to remind power that someone is watching, and someone will remember.
-
-[07:16 - 07:42] OUTRO CREDITS:
-SIYA: "Algorithm in the Archive" was reported and written by Siya, with audio engineering, sound design, and field capture by Liam O'Connor. Fact-checking by Priya Patel and archival research by Marcus Vance. Special thanks to the Department of Media Studies for studio access.
-Visit thedispatch.org for sources, audio files, and complete transcripts. This is The Dispatch.`,
-    },
-    sources: [
-      {
-        id: 'pod-s-1',
-        title: 'Digital Preservation Coalition Campus Archive Audit 2025',
-        organization: 'Independent Press Association',
-        date: '2025-11-10',
-        note: 'Comprehensive audit analyzing link-rot and missing archive databases across 48 student news publications.',
-        verified: true,
-      },
-      {
-        id: 'pod-s-2',
-        title: 'Oral History Interview with Prof. Julian Morales',
-        organization: 'Department of Media Studies & Archival Preservation',
-        date: '2026-10-04',
-        note: '42-minute primary interview focusing on the transition from microfiche to proprietary Content Management Systems.',
-        verified: true,
-      },
-    ],
-    body: `### Audio Summary & Production Overview
-
-In this 7-minute and 42-second investigative podcast, *The Dispatch* investigates the quiet digital catastrophe confronting student newsrooms across North America: the gradual disappearance of their own history.
-
-When campus newspapers migrated from physical print editions to early web platforms in the late 1990s, the promise was infinite democratized access. But today, broken CMS migrations, proprietary cloud paywalls, and social media algorithmic suppression have created what media historians call a "digital black hole"—with decades of investigative reporting vanishing without a trace.
-
-Listen to the audio documentary above, or consult the complete verified broadcast script and transcript below.`,
-  },
-  {
-    id: 'dispatch-darkroom-analog',
-    slug: 'the-3am-darkroom-analog-revival',
-    headline: 'The 3 A.M. Darkroom: The Quiet Revival of Analog Film in a Hyper-Digital Age',
-    subheading: 'Eight documentary frames exploring silver halide, patience, and tangible darkroom craft.',
-    summary: 'Amid endless smartphone feeds and algorithmic feeds, a growing community of student photographers is retreating into the red glow of the chemical darkroom. Eight documentary frames capturing silver halide, patience, and tangible craft.',
-    category: 'Culture',
-    format: 'photo',
-    status: 'published',
-    publishedAt: '2026-10-16',
+    publishedAt: '2026-10-22',
     readingTime: 3,
     isLead: false,
-    isDemo: true,
-    authors: [CONTRIBUTORS.maya, CONTRIBUTORS.siya],
+    isDemo: false,
+    authors: [
+      { ...CONTRIBUTORS.arpita, isPrimary: true, contributionRole: 'Reporter / Writer' },
+      { ...CONTRIBUTORS.samridhi, contributionRole: 'Editor' },
+    ],
     cover: {
-      src: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=1600&q=80',
-      alt: 'Photographic prints drip-dry from stainless-steel wire lines in the fine arts communal darkroom at 3:15 AM.',
-      credit: 'Maya Chen / The Dispatch',
-      caption: 'Frame 1: Photographic prints drip-dry from stainless-steel wire lines in the fine arts communal darkroom at 3:15 AM.',
-      width: 1600,
-      height: 1000,
+      src: '/images/articles/delhi-commute-metro-montage.png',
+      alt: 'Delhi Metro passenger and platform crowd during morning rush hour',
+      credit: 'Original photograph (Short Story.pdf)',
+      source: 'Original document: Short Story.pdf',
+      caption: 'Reaching the capital every day is not simply a commute; it is a masterclass in endurance, patience, and tactical navigation.',
+      isVerifiedSource: true,
+      width: 927,
+      height: 308,
     },
+    sourcePdf: {
+      filename: 'Short Story.pdf',
+      url: '/documents/Short Story.pdf',
+      sizeBytes: 1605374,
+      pageCount: 2,
+    },
+    pdfPages: [
+      '/images/articles/delhi-commute-metro-montage.png',
+      '/images/articles/delhi-commute-road-montage.png',
+    ],
+    sources: [
+      {
+        id: 'dc-s-1',
+        title: 'Source Document: Short Story.pdf',
+        organization: 'The Dispatch Commuter Desk',
+        date: '2026-10-22',
+        url: '/documents/Short Story.pdf',
+        note: 'Original 2-page manuscript capturing the daily transit reality from satellite cities to the national capital.',
+        verified: true,
+      },
+    ],
+    body: `### The Morning Gauntlet
+
+Themorning alarm is a sharp, unforgiving siren at 5:30 AM. For millions living in the satellite towns of Noida,Gurugram, or Ghaziabad, this is the official start of the daily pilgrimage to Delhi. Reaching the capital every day is not simply a commute; it is a masterclass in endurance, patience, and tactical navigation.
+
+By 6:45 AM, the roads leading to metro stations are already alive with restless energy. The air carries the smell of wet asphalt, roadside tea, and diesel exhaust as commuters move quickly, preparing themselves for another long day.
+
+### The Metro Gauntlet
+
+Thefirst major hurdle is the station entrance. Security queues stretch beyond the glass doors, forming dense sea of backpacks, formal shirts, and identity cards. Inside, the platform becomes a pressure cooker. When the train arrives, the unwritten rules of the Delhi commute take over. Passengers push forward while others try to get out, creating a synchronized but chaotic movement. You do not really walk onto the train; the momentum of the crowd carries you inside.
+
+Inside the coach, personal space almost disappears. Strangers stand shoulder to shoulder, yet an unusual bubble of collective isolation forms. Some commuters use earphones to escape the noise, others disappear into their phone screens, while a few manage the remarkable skill of sleeping while standing upright.
+
+![Inside the Delhi metro coach and the crowded platform entrance](/images/articles/delhi-commute-metro-montage.png)
+
+> “You do not walk onto the train; you are swept inside by the sheer momentum of the crowd.”
+
+### The Road Alternative
+
+For those who choose the road instead of the rails, the experience is equally exhausting. The DND Flyway and the Gurugram–Delhi expressway can turn into enormous, multi-lane parking lots during peak hours. Red brake lights stretch towards the horizon like a glowing river of frustration. Drivers move forward by inches while navigating aggressive lane changes, weaving motorcycles, buses, and the growing heat rising from the concrete.
+
+### Finally Reaching the Capital
+
+Bythe time the train doors openat RajivChowk or a car finally reaches a Connaught Place parking lot,nearly two hours may have passed. A significant part of the day’s energy has already been spent before the working day has properly begun. Commuters step into the Delhi air, adjust their clothes, take a deep breath, and begin walking towards their offices.
+
+The journey is more than a daily movement between two points. It is a routine of queues, crowds, traffic, noise, patience, and quiet determination. Thousands of commuters repeat it because work, education, and opportunity demand it. They have made it to the capital—but the thought of the return journey is already waiting in the background.
+
+![Highway expressway gridlock and commuters walking in Connaught Place](/images/articles/delhi-commute-road-montage.png)
+
+> “They have made it to the capital. But in just eight hours, they will have to do it all over again.”`,
+  },
+
+  // ---------------------------------------------------------------------------
+  // 3. SHORT-FORM INVESTIGATIVE FEATURE: kirti(8).pdf
+  // ---------------------------------------------------------------------------
+  {
+    id: 'dispatch-every-day-a-new-protest',
+    slug: 'every-day-a-new-protest',
+    headline: 'EVERY DAY, A NEW PROTEST',
+    subheading: 'What happens when people feel they are not being heard? An examination of student exam marches, European unrest, and law-and-order doctrine.',
+    summary: 'From student exam marches and electoral rolls in India to a historic town hall fire in France and hard-line force in the US, an international investigation into global protest movements.',
+    category: 'Investigations',
+    format: 'short',
+    status: 'published',
+    publishedAt: '2026-10-22',
+    readingTime: 4,
+    isLead: false,
+    isDemo: false,
+    authors: [
+      { ...CONTRIBUTORS.kirti, isPrimary: true, contributionRole: 'Reporter / Writer' },
+      { ...CONTRIBUTORS.samridhi, contributionRole: 'Editor' },
+    ],
+    cover: {
+      src: '/images/articles/every-day-protest-cover-illustration.png',
+      alt: 'Editorial illustration: protest movements in India, France and the United States',
+      credit: 'Editorial illustration (kirti(8).pdf)',
+      source: 'AI-generated editorial illustration (kirti(8).pdf source file)',
+      caption: 'Editorial illustration: protest movements in India, France and the United States. This is an illustration, not a documentary photograph of one event.',
+      isVerifiedSource: false,
+      width: 1935,
+      height: 1912,
+    },
+    sourcePdf: {
+      filename: 'kirti(8).pdf',
+      url: '/documents/kirti(8).pdf',
+      sizeBytes: 750133,
+      pageCount: 3,
+    },
+    pdfPages: [
+      '/images/articles/every-day-protest-page-1.png',
+      '/images/articles/every-day-protest-page-2.png',
+      '/images/articles/every-day-protest-page-3.png',
+    ],
+    sources: [
+      {
+        id: 'ev-1',
+        title: "Modi's predicament: GenZ pours out on India's streets as dissent surges",
+        organization: 'Reuters',
+        date: '2026-10-16',
+        url: 'https://www.reuters.com/world/asia-pacific/modis-predicament-gen-z-pours-out-indias-streets-dissent-surges-2026-10-16/',
+        verified: true,
+      },
+      {
+        id: 'ev-2',
+        title: "In France's Limoges, the fire-ravaged town hall rekindles memories of Notre Dame",
+        organization: 'Reuters',
+        date: '2026-10-18',
+        url: 'https://www.reuters.com/world/frances-limoges-fire-ravaged-town-hall-rekindles-memories-notre-dame-2026-10-18/',
+        verified: true,
+      },
+      {
+        id: 'ev-3',
+        title: 'Spire collapses at historic Limoges town hall amid violent protests across France',
+        organization: 'Euronews',
+        date: '2026-10-18',
+        url: 'https://www.euronews.com/2026/10/18/spire-collapses-at-historic-limoges-town-hall-amid-violent-protests-across-france',
+        verified: true,
+      },
+      {
+        id: 'ev-4',
+        title: 'Trump remarks on political protests in Los Angeles',
+        organization: 'The White House / U.S. Government Publishing Office',
+        date: '2025-06-08',
+        url: 'https://www.govinfo.gov/content/pkg/DCPD-202500673/html/DCPD-202500673.htm',
+        verified: true,
+      },
+      {
+        id: 'ev-5',
+        title: 'Source Document: kirti(8).pdf',
+        organization: 'Original Editorial Submission',
+        date: '2026-10-22',
+        url: '/documents/kirti(8).pdf',
+        note: 'Original 3-page manuscript with reporting notes and citations.',
+        verified: true,
+      },
+    ],
+    body: `The world seems to wake up to a new protest every day. Students march over exams, women demand safety and dignity, citizens question elections, and workers protest the rising cost of living. From the streets of India to a historic town hall in France and demonstrations in the United States, the scenes are different—but the question is familiar: what happens when people feel they are not being heard?
+
+### 1. India: Students, women and the question of trust
+
+In India, protests often begin with a demand for fairness. For students, competitive examinations such as NEET can represent years of preparation, family sacrifice and the hope of a future career. Allegations of paper leaks or irregularities can turn that hope into anger. Young people who believe their future has been put at risk take to the streets asking for transparent investigations and accountability.
+
+Women's groups have also marched against violence, discrimination and alleged mistreatment during demonstrations. Their message is not simply that they want to be safe in public spaces; it is that institutions must listen when women report harm. Meanwhile, the phrase “vote chori”—literally, “theft”—has become a political rallying cry around allegations concerning electoral rolls and the fairness of elections. These are contested claims, not proof of wrongdoing by themselves, and they require evidence, transparent procedures and independent scrutiny.
+
+Recent reporting in October 2026 described protests over electoral-roll revisions and calls for accountability, alongside international concern about alleged excessive force against demonstrators. The Election Commission and government institutions have their own explanations and procedures; a fair account must examine both the allegations and the evidence. The larger issue is trust: people need to believe that exams are fair, complaints are investigated and votes are counted through a credible process.
+
+### 2. France: A historic building consumed by fire
+
+On 17 October 2026, protests across France over the cost of living and conditions in schools were accompanied by clashes and acts of destruction. In Limoges, a fire devastated the city's historic town hall, inaugurated in 1883. Reports said the roof and tower were badly damaged or collapsed. The building had stood through two world wars, yet it was severely damaged in a single night of unrest.
+
+The image is powerful because a public building is more than stone, timber and a clock tower: it carries a city's memories. But it is important not to confuse a protest movement with every act committed during it. Many people may demonstrate peacefully while a smaller group engages in arson or looting. Burning a civic building does not automatically make a protest's original grievances disappear, but it can endanger lives, destroy shared heritage and shift public attention away from the issues that brought people into the streets.
+
+France's experience leaves a difficult question: how can a society protect the right to protest while also protecting people, public spaces and historic places from violence?
+
+### 3. Donald Trump: Protests, force and “law and order”
+
+In the United States, President Donald Trump's response to protests has often emphasised law and order. During demonstrations in Los Angeles in June 2025 linked to federal immigration enforcement, Trump defended the deployment of National Guard troops and Marines and warned that further protests could face equal or greater force. His public comments presented the response as a way to protect police and restore order.
+
+Supporters of a hard-line response argue that authorities must prevent violence and protect people and property. Critics warn that deploying military forces against demonstrations can escalate tensions and chill peaceful dissent. These positions raise a basic democratic distinction: authorities can act against specific violence, but peaceful assembly and criticism of government are also fundamental rights. A protest should not be treated as violent simply because it is inconvenient or politically uncomfortable.
+
+### When the shouting fades
+
+Across countries, protests are not all the same. Some demand exam justice, some challenge alleged electoral wrongdoing, some oppose economic hardship, and others resist government policy. Some remain peaceful; others are overtaken by violence. Each event deserves careful reporting rather than a single label.
+
+A protest is a warning signal: something in the relationship between people and power may need attention. Governments have a duty to maintain public safety, and protesters have a responsibility not to harm others. Journalists have another duty—to verify claims, distinguish peaceful demonstrators from those who commit violence, and ask who is being heard and who is being ignored.
+
+Perhaps the most important question is not why the world protests every day, but why so many people feel they must. The answer begins when we look beyond the smoke, slogans and headlines—and listen to the demands beneath them.
+
+[Note: This is a short journalism-style feature. Verify the latest details and add your name/class/roll number if your teacher requires them. The cover image is AI-generated editorial illustration, not a news photograph.]`,
+  },
+
+  // ---------------------------------------------------------------------------
+  // 4. PHOTO JOURNALISM & SOCIETY DEEP-DIVE: kirti(1)(1).pdf
+  // ---------------------------------------------------------------------------
+  {
+    id: 'dispatch-beyond-the-slogans',
+    slug: 'beyond-the-slogans-real-impact-of-protests',
+    headline: 'Beyond the Slogans: The Real Impact of Protests',
+    subheading: 'The Other Side of a Protest: Who Pays the Price When the Streets Become a Battlefield of Demands?',
+    summary: 'A deep investigation into the wider ripple effects of street demonstrations on local residents, small businesses, the viral digital crowd, and public trust.',
+    category: 'Society',
+    format: 'photo',
+    status: 'published',
+    publishedAt: '2026-10-21',
+    readingTime: 8,
+    isLead: false,
+    isDemo: false,
+    authors: [
+      { ...CONTRIBUTORS.kirti, isPrimary: true, contributionRole: 'Reporter / Writer' },
+      { ...CONTRIBUTORS.samridhi, contributionRole: 'Editor' },
+    ],
+    cover: {
+      src: '/images/articles/beyond-slogans-rani-beti.png',
+      alt: 'Demonstrator holding placard: RANI BETI REBEL KAREGI IN THE POOJA YOU DO WHAT',
+      credit: 'Original photograph (kirti(1)(1).pdf)',
+      source: 'Original document: kirti(1)(1).pdf',
+      caption: 'The Other Side of a Protest: Who Pays the Price When the Streets Become a Battlefield of Demands?',
+      isVerifiedSource: true,
+      width: 880,
+      height: 870,
+    },
+    sourcePdf: {
+      filename: 'kirti(1)(1).pdf',
+      url: '/documents/kirti(1)(1).pdf',
+      sizeBytes: 1474301,
+      pageCount: 4,
+    },
+    pdfPages: [
+      '/images/articles/beyond-slogans-page-1.png',
+      '/images/articles/beyond-slogans-page-2.png',
+      '/images/articles/beyond-slogans-page-3.png',
+      '/images/articles/beyond-slogans-page-4.png',
+    ],
     media: {
       type: 'gallery',
       photos: [
         {
-          id: 'pf-1',
-          url: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=1400&q=80',
-          caption: '01 / THE DRYING LINE. Freshly developed 8x10 fiber prints hang from wooden clothespins above the washing sink. Each print represents roughly forty minutes of manual exposure balancing and chemical tray agitation.',
-          photographer: 'Maya Chen / The Dispatch',
-          altText: 'Photographic prints drying on wires in darkroom',
-          location: 'Visual Arts Darkroom 104',
+          id: 'bts-1',
+          url: '/images/articles/beyond-slogans-rani-beti.png',
+          caption: '01 / RANI BETI REBEL KAREGI. Demonstrator holding hand-painted placard during student rally for safety and institutional accountability.',
+          photographer: 'Original documentary photo (kirti(1)(1).pdf)',
+          source: 'Original reporting document (kirti(1)(1).pdf)',
+          isVerifiedSource: true,
+          location: 'Protest corridor',
         },
         {
-          id: 'pf-2',
-          url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1400&q=80',
-          caption: '02 / THE TOOLS OF PATIENCE. A mechanical 1978 SLR camera resting beside a Paterson film developing tank, heavy negative sleeves, and a brass grain focuser.',
-          photographer: 'Maya Chen / The Dispatch',
-          altText: 'Vintage mechanical camera and darkroom equipment on table',
-          location: 'Equipment Staging Bay',
+          id: 'bts-2',
+          url: '/images/articles/beyond-slogans-power-of-people.png',
+          caption: '02 / THE POWER OF THE PEOPLE. Banner reading "The Power of the People is Stronger than the People in Power" lifted above demonstration crowd.',
+          photographer: 'Original documentary photo (kirti(1)(1).pdf)',
+          source: 'Original reporting document (kirti(1)(1).pdf)',
+          isVerifiedSource: true,
+          location: 'Central gathering',
         },
         {
-          id: 'pf-3',
-          url: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&w=1400&q=80',
-          caption: '03 / NEGATIVE CONTACT SHEET. Senior art student Elena Rostova examines a newly dried strip of Ilford HP5 400 film through a 4x magnifying loupe to inspect shutter synchronization.',
-          photographer: 'Maya Chen / The Dispatch',
-          altText: 'Photographer looking closely at film negatives through magnifying loupe',
-          location: 'Light Table Station 3',
+          id: 'bts-3',
+          url: '/images/articles/beyond-slogans-police-barricade.png',
+          caption: '03 / CIVILIAN PERIMETER. Security barricades deployed across public intersections, redirecting residential traffic and emergency routes.',
+          photographer: 'Original documentary photo (kirti(1)(1).pdf)',
+          source: 'Original reporting document (kirti(1)(1).pdf)',
+          isVerifiedSource: true,
+          location: 'Civic perimeter',
         },
         {
-          id: 'pf-4',
-          url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1400&q=80',
-          caption: '04 / THE CHEMICAL BATH. Tongs submerge an exposed sheet of multigrade paper into the developer tray. Within twelve seconds, the latent silver halides darken into rich carbon blacks.',
-          photographer: 'Maya Chen / The Dispatch',
-          altText: 'Hands gently moving photographic print through liquid chemicals in tray',
-          location: 'Chemical Sink Line',
+          id: 'bts-4',
+          url: '/images/articles/beyond-slogans-closed-shop.png',
+          caption: '04 / ECONOMIC TOLL. A local shop remains closed due to the ongoing protest, resulting in loss of daily income for small traders.',
+          photographer: 'Original documentary photo (kirti(1)(1).pdf)',
+          source: 'Original reporting document (kirti(1)(1).pdf)',
+          isVerifiedSource: true,
+          location: 'Commercial market district',
         },
         {
-          id: 'pf-5',
-          url: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1400&q=80',
-          caption: '05 / AMBIENT AMBER. Safe light filters cast a warm amber glow across the chemical mixing station, where stop baths and rapid fixers are precisely calibrated to 20°C.',
-          photographer: 'Maya Chen / The Dispatch',
-          altText: 'Amber safelight illuminating glass graduate cylinders and chemical bottles',
-          location: 'Darkroom Chemical Prep Area',
+          id: 'bts-5',
+          url: '/images/articles/beyond-slogans-govt-meeting.png',
+          caption: '05 / INSTITUTIONAL DIALOGUE. Government and administrative representatives convene stakeholder meetings to review policy demands.',
+          photographer: 'Original documentary photo (kirti(1)(1).pdf)',
+          source: 'Original reporting document (kirti(1)(1).pdf)',
+          isVerifiedSource: true,
+          location: 'Administrative conference room',
         },
         {
-          id: 'pf-6',
-          url: 'https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?auto=format&fit=crop&w=1400&q=80',
-          caption: '06 / FOCUS UNDER ENLARGER. Adjusting the bellows knob on a Beseler 23C enlarger to crop an architectural portrait before exposing the emulsion.',
-          photographer: 'Maya Chen / The Dispatch',
-          altText: 'Enlarger lens projecting beam of light onto darkroom easel',
-          location: 'Enlarger Station 6',
+          id: 'bts-6',
+          url: '/images/articles/beyond-slogans-media-cameras.png',
+          caption: '06 / THE PRESS LINE. Broadcast television and digital news camera crews reporting on demonstration developments.',
+          photographer: 'Original documentary photo (kirti(1)(1).pdf)',
+          source: 'Original reporting document (kirti(1)(1).pdf)',
+          isVerifiedSource: true,
+          location: 'Press conference area',
         },
         {
-          id: 'pf-7',
-          url: 'https://images.unsplash.com/photo-1520697830682-bbb6e85e2b0b?auto=format&fit=crop&w=1400&q=80',
-          caption: '07 / THE ARCHIVE BINDER. Archival polypropylene sleeves protecting decades of campus student work, categorized by date, emulsion batch, and chemical dilution.',
-          photographer: 'Maya Chen / The Dispatch',
-          altText: 'Open binder filled with transparent sleeves of black and white negatives',
-          location: 'Darkroom Society Archives',
+          id: 'bts-7',
+          url: '/images/articles/beyond-slogans-save-students.png',
+          caption: '07 / SAVE STUDENTS. Youth placard reading "Take Responsibilities, Save Students" raised amid examination accountability rallies.',
+          photographer: 'Original documentary photo (kirti(1)(1).pdf)',
+          source: 'Original reporting document (kirti(1)(1).pdf)',
+          isVerifiedSource: true,
+          location: 'University march',
         },
         {
-          id: 'pf-8',
-          url: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1400&q=80',
-          caption: '08 / EMERGENCE AT SUNRISE. Two student photographers pack up their camera bags as daylight seeps through the basement ventilation shafts at 5:45 AM.',
-          photographer: 'Maya Chen / The Dispatch',
-          altText: 'Students walking out of darkroom hallway into early morning light',
-          location: 'Fine Arts Sub-Basement Exit',
+          id: 'bts-8',
+          url: '/images/articles/beyond-slogans-baddies-apolitical.png',
+          caption: '08 / BADDIES AREN’T APOLITICAL. Creative banner asserting the civic engagement and political agency of young demonstrators.',
+          photographer: 'Original documentary photo (kirti(1)(1).pdf)',
+          source: 'Original reporting document (kirti(1)(1).pdf)',
+          isVerifiedSource: true,
+          location: 'Demonstration route',
         },
       ],
     },
     sources: [
       {
-        id: 'photo-s-1',
-        title: 'Student Darkroom Society Equipment Registry & Chemical Log',
-        organization: 'Faculty of Visual Arts & New Media',
-        date: '2026-10-01',
-        note: 'Documentation of a 140% surge in darkroom locker registrations over the past four semesters.',
+        id: 'bts-s-1',
+        title: 'Source Document: kirti(1)(1).pdf',
+        organization: 'Society & Change Editorial Desk',
+        date: '2026-10-21',
+        url: '/documents/kirti(1)(1).pdf',
+        note: 'Original 4-page photographic investigation into the 8 societal impacts of street demonstrations.',
         verified: true,
       },
     ],
-    body: `### The Resistance to the Instant
+    body: `While protests aim to bring change, their effects are far wider than just the people on the streets.
 
-In an academic environment saturated with instant notifications, AI image generation, and smartphone cameras that process fifty computational frames per millisecond, the physical darkroom represents an intentional act of resistance.
+From everyday citizens to local businesses, from online viewers to the government protests leave a mark on everyone.Protests have always played an important role in society. They provide people with a platform to express their opinions, demand justice, question government policies, and fight against inequality. From the freedom movements of the past to modern demonstrations for social justice, protests have helped bring attention to issues that might otherwise have been ignored. They are an essential part of democracy because they allow citizens to raise their voices and participate in public life.
 
-According to student registry logs, the university's Darkroom Society has witnessed a 140 percent surge in active keyholders over the past four semesters. For the students who spend their late nights bathed in amber safelight, the attraction lies precisely in what digital photography removes: physical limits, chemical alchemy, and the real possibility of failure.
+However, the impact of a protest goes far beyond the people standing on the streets and raising slogans. Every demonstration affects different sections of society in different ways. While protesters may be fighting for a meaningful cause, local residents may face traffic problems, students may struggle to reach college, shopkeepers may lose their daily income, and commuters may experience delays. At the same time, social media can spread awareness about a movement or create confusion through misinformation.
 
-"When you only have 36 exposures on a roll that costs eighteen dollars to purchase and develop, every single frame demands consideration," explains Elena Rostova, a third-year biology student who spends Friday nights in the sub-basement of the Fine Arts Building. "[Insert verified quotation: Chemical photography teaches a deliberate patience that directly transfers to scientific observation]."
+Therefore, to understand the real impact of protests, it is important to look beyond slogans and examine how demonstrations affect ordinary people, communities, businesses, and the government.
 
-Explore the documentary photo essay above using either the full editorial masonry grid or the sequential carousel.`,
-  },
-  {
-    id: 'dispatch-mutual-aid-kitchen',
-    slug: 'boiling-point-campus-mutual-aid',
-    headline: 'Boiling Point: Inside the Student Mutual-Aid Kitchen Tackling Campus Food Insecurity',
-    subheading: 'A 110-second documentary short on grassroots solidarity and student dignity amid rising grocery inflation.',
-    summary: 'With grocery inflation outpacing student bursaries, a volunteer mutual-aid kitchen serves 450 hot meals every Tuesday. A 110-second documentary short on grassroots solidarity and student dignity.',
-    category: 'Society',
-    format: 'video',
-    status: 'published',
-    publishedAt: '2026-10-17',
-    readingTime: 2,
-    isLead: false,
-    isDemo: true,
-    authors: [CONTRIBUTORS.siya, CONTRIBUTORS.liam],
-    cover: {
-      src: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1600&q=80',
-      alt: 'Volunteers prep locally rescued produce inside the Student Union Community Kitchen at 11:30 AM before the lunch rush.',
-      credit: 'Maya Chen / The Dispatch',
-      caption: 'Volunteers prep locally rescued produce inside the Student Union Community Kitchen at 11:30 AM before the lunch rush.',
-      width: 1600,
-      height: 1000,
-    },
-    media: {
-      type: 'video',
-      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-      duration: '01:52',
-      transcript: `[SHORT VIDEO BROADCAST SCRIPT]
-TITLE: BOILING POINT — MUTUAL AID ON CAMPUS
-RUNNING TIME: 01:52 (112 SECONDS)
-REPORTER: Siya | CAMERA & EDIT: Liam O'Connor
+![RANI BETI REBEL KAREGI IN THE POOJA YOU DO WHAT](/images/articles/beyond-slogans-rani-beti.png)
 
-[00:00 - 00:14] VISUAL: Rapid kinetic montage. Knife slicing through fresh cilantro; large ladle stirring a 40-liter industrial pot of steaming lentil stew; steam rising into fluorescent kitchen lights.
-SIYA (VOICEOVER): It’s 10:30 AM in the basement of the Student Union. The university food court upstairs is selling eight-dollar breakfast muffins. But down here? The price is zero.
+### 1. It's Not Just About the Protestors and Their Demands
 
-[00:15 - 00:36] VISUAL: Medium shot of volunteer coordinator Amina Kouri seasoning soup; cut to exterior queue of students outside the doors.
-AMINA (ON CAMERA): "[Insert verified quotation: We refuse the charity model. Charity is top-down; mutual aid is lateral. When rent takes eighty percent of your paycheck, eating fresh vegetables shouldn’t be a luxury.]"
-SIYA (VO): Amina is one of eighteen student volunteers behind The Common Pot. Every Tuesday, they turn 600 pounds of rescued farmers-market surplus into hot, dignified meals for over four hundred classmates.
+For protesters, a demonstration is often a way to demand change and make their concerns visible. People participate in protests for various reasons, including unemployment, rising prices, corruption, environmental damage, discrimination, educational reforms, and other social or political issues. They may believe that peaceful demonstrations are necessary when other methods of communication fail to bring attention to their problems.
 
-[00:37 - 01:05] VISUAL: Graphical overlay on screen showing statistics from the National Campus Food Security Survey: 38.6% of students experience food insecurity. Cut to shots of students sitting at communal folding tables, laughing, sharing meals.
-SIYA (VO): According to this year’s National Campus Food Security Report, nearly four in ten students report skipping meals to afford course textbooks and transit passes. What started as an emergency response during midterms has evolved into a permanent campus institution.
+Protests can create unity among people who share similar experiences. They help individuals realise that they are not alone in their struggles. When large numbers of people come together, their demands may receive attention from the media, policymakers, and the wider public.
 
-[01:06 - 01:34] VISUAL: Close-up of handwritten meal menu written on kraft butcher paper; volunteer handing a warm container to an engineering student.
-STUDENT RECIPIENT: "[Insert verified quotation: It’s not just the meal. You come here between four hours of coding labs and someone asks how you’re doing. It’s the warmest place on campus.]"
+Nevertheless, participation in a protest can involve considerable challenges. Protesters may spend long hours standing in crowded areas, travelling to demonstration sites, or facing uncertain conditions. Some may experience physical exhaustion, emotional stress, or difficulties in balancing their participation with their education, work, and family responsibilities.
 
-[01:35 - 01:52] VISUAL: Wide shot of clean-up crew washing massive stainless pots together, music reaches uplifting crescendo. Lower-third graphic: "The Common Pot serves Tuesdays & Thursdays, Student Union B12."
-SIYA (ON CAMERA STANDUP): In a semester defined by the rising cost of living, these students are proving that community care isn’t just a slogan—it’s an active recipe. For The Dispatch, I’m Siya.`,
-    },
-    sources: [
-      {
-        id: 'vid-s-1',
-        title: 'National Campus Food Security Assessment Survey 2025-26',
-        organization: 'Higher Education Research Consortium',
-        date: '2026-03-12',
-        note: 'Reveals 38.6% of enrolled undergraduates experienced moderate to severe food insecurity during term time.',
-        verified: true,
-      },
-    ],
-    body: `### Video Report Overview & Caption
+![THE POWER OF THE PEOPLE IS STRONGER THAN THE PEOPLE IN POWER](/images/articles/beyond-slogans-power-of-people.png)
 
-**Headline:** Boiling Point: Inside the Student Mutual-Aid Kitchen Tackling Campus Food Insecurity  
-**Format:** Short Video Report (112 seconds) | **Published:** October 17, 2026  
+The impact also extends to people who are not directly involved in the movement. Families may worry about the safety of their members, while communities may become divided over the demands being raised. Some citizens may strongly support the cause, whereas others may disagree with the methods used.
 
-With food prices in collegiate neighborhoods climbing 9.4% over the past eighteen months, campus emergency food pantries are experiencing unprecedented queues. In response, a student-organized collective called *The Common Pot* has transformed an underutilized basement catering kitchen into a vibrant mutual-aid hub. Every Tuesday and Thursday, twenty volunteers rescue surplus produce from regional markets and transform it into 450 hearty, nutritious meals served with zero eligibility hurdles or stigma.
+This shows that a protest is not simply a confrontation between protesters and the government. It is a social event that affects people with different needs, opinions, and responsibilities.
 
-Watch our 110-second video report above, or read the complete broadcast script below.`,
+### 2. The People Living in the Area
+
+One of the most overlooked groups during demonstrations is the local population. Residents living near protest sites often experience the immediate consequences of large gatherings. Road closures, traffic diversions, loud slogans, security barricades, and crowded public spaces can make everyday life difficult. For example, a student may arrive late for an examination because the usual road is blocked. An office employee may miss an important meeting due to traffic congestion. Elderly people may find it difficult to reach hospitals, while families with young children may struggle to move through crowded streets.
+
+Emergency services can also face challenges if traffic restrictions delay ambulances or other essential vehicles. Public transport routes may change, increasing travel time and expenses for commuters. In some situations, residents may find it difficult to access local markets, schools, or workplaces. However, it would be unfair to assume that all residents oppose protests. Many people living near demonstration sites support the cause and understand why citizens are raising their voices. They may even provide water, food, shelter, or other assistance to peaceful demonstrators.
+
+![Security barricades and police line during public gathering](/images/articles/beyond-slogans-police-barricade.png)
+
+The real issue is how to balance the right to protest with the daily needs of the people living in the surrounding area. Authorities and organisers should make efforts to maintain emergency access, provide clear information about traffic diversions, and reduce unnecessary inconvenience.
+
+A resident’s right to peaceful daily life and a protester’s right to express disagreement are both important. A democratic society must try to protect both.
+
+### 3. Local Businesses and Financial Losses
+
+Local businesses are another group that may face serious difficulties during prolonged protests. Small shopkeepers, street vendors, restaurant owners, delivery workers, and other service providers often depend on regular customer visits to earn their daily income.
+
+When roads are blocked or an area becomes difficult to access, customers may avoid visiting nearby markets. Shops may remain closed because of safety concerns, and public transport disruptions can reduce the number of people passing through commercial areas.
+
+For a large business, a temporary decline in sales may be manageable. However, for a small shopkeeper, even a few days without sufficient income can create financial pressure. Rent, electricity bills, employee salaries, loan repayments, and household expenses continue even when sales decrease.
+
+![A local shop remains closed due to the ongoing protest, resulting in loss of business.](/images/articles/beyond-slogans-closed-shop.png)
+
+Street vendors and daily-wage workers may be particularly vulnerable because they often lack savings or financial protection. If they cannot work, they may immediately lose their source of income. Delivery workers may also face longer routes, cancelled orders, and increased fuel expenses.
+
+At the same time, the economic impact of protests is not always negative for every business. Some shops selling food, water, transport services, or essential supplies may experience increased demand. The overall effect depends on the location, duration, size, and nature of the demonstration.
+
+It is also important to recognise that economic losses should not automatically be used to dismiss the demands of protesters. Many movements emerge because people are already experiencing financial hardship, unemployment, or unfair treatment.
+
+The challenge is to reduce unnecessary economic damage while allowing citizens to express legitimate grievances. Better planning, designated demonstration areas, communication with local traders, and compensation mechanisms where appropriate can help reduce the burden on small businesses.
+
+### 4. The ‘Viral’ Crowd
+
+In today’s digital world, many people use protests as an opportunity to get attention online. They post selfies, short videos, or captioned reels without fully understanding the issue. While social media can help spread awareness, it also leads to misinformation, false narratives and a dilution of the real message. For many, it becomes more about likes, views and followers than the actual cause.In the digital age, protests no longer remain limited to physical streets. Social media platforms allow people to share photographs, videos, personal experiences, slogans, and updates with audiences across the world. A local issue can quickly become a national conversation when people begin discussing and sharing it online.
+
+Digital platforms can make protests more accessible. Individuals who cannot physically attend a demonstration may support a cause by sharing verified information, signing petitions, donating to legitimate initiatives, or participating in online discussions. Social media can also help document events and bring attention to issues that receive limited coverage elsewhere.
+
+![Crowd demonstrating in street](/images/articles/beyond-slogans-crowd-protest.png)
+
+However, the same platforms can create serious problems. Short videos and photographs may be shared without sufficient context. Old footage may be presented as a recent event, misleading captions may distort the facts, and unverified claims can spread rapidly.
+
+Sometimes, people react to a headline or a short clip without understanding the complete background of an issue. This can increase anger, encourage stereotypes, and deepen divisions between different groups.
+
+Another concern is that online participation can become focused on likes, views, shares, and followers rather than meaningful engagement with the cause. A protest may become a trending topic for a short period, only to disappear from public attention before any long-term change takes place.
+
+This does not mean that digital activism is useless. Rather, it highlights the importance of responsible participation. Users should verify information before sharing it, consult reliable news sources, and distinguish between facts, opinions, and rumours.
+
+The real strength of digital protest lies not simply in how widely a message spreads, but in whether it encourages informed discussion and meaningful action.
+
+### 5. How the Government Responds
+
+The government’s response plays a significant role in determining the outcome of a protest. In a democracy, authorities have a responsibility to maintain public order while respecting citizens’ fundamental rights.
+
+An effective response begins with listening. Government representatives can communicate with protest organisers, understand their demands, and explore possible solutions. Dialogue can help reduce tensions and prevent disagreements from becoming more serious.
+
+Sometimes, authorities establish committees, organise meetings, announce policy changes, or agree to review particular decisions. In other situations, they may introduce restrictions, redirect traffic, or take legal action when they believe public safety is at risk.
+
+![Government and stakeholder consultation](/images/articles/beyond-slogans-govt-meeting.png)
+
+Ultimately, the success of a government response should not be measured only by how quickly a protest ends. It should also be measured by whether the underlying concerns are addressed and public trust is strengthened.
+
+However, the use of excessive force, unnecessary restrictions, or a lack of communication can increase public anger and reduce trust in institutions. If people feel that their concerns are being ignored, they may become more determined to continue demonstrating.
+
+At the same time, authorities must respond appropriately to violence, property damage, and threats to public safety. Protecting the right to peaceful assembly does not mean ignoring the safety and rights of other citizens.
+
+A balanced approach requires transparency, proportional action, accessible communication, and accountability. The government should explain its decisions clearly and ensure that any restrictions are lawful and justified.
+
+### 6. The Role of the Media in Shaping Public Opinion
+
+The media has a major responsibility during protests because its reporting influences how the public understands a movement. Newspapers, television channels, digital news platforms, and independent journalists can provide information about the reasons behind a demonstration, the experiences of participants, and the response of authorities.
+
+Responsible reporting presents verified facts, includes different perspectives, and explains the background of an issue. Journalists should speak to protesters, residents, business owners, experts, and officials rather than relying on a single viewpoint.
+
+![Broadcast cameras reporting from demonstration](/images/articles/beyond-slogans-media-cameras.png)
+
+Sensational headlines and dramatic images may attract attention, but they can also create fear and misunderstanding. If coverage focuses only on clashes or traffic problems, the original demands of a movement may be overlooked. Similarly, reporting only the protesters’ arguments without examining relevant facts can leave audiences with an incomplete understanding.
+
+Journalists must distinguish between verified information and allegations. They should avoid spreading rumours, respect people’s privacy, and correct mistakes when they occur.
+
+The media should neither automatically glorify every protest nor dismiss every demonstration as a public disturbance. Its role is to inform citizens, encourage critical thinking, and hold powerful institutions accountable.
+
+### 7. The Psychological and Social Impact of Protests
+
+Protests can also influence people’s emotions, relationships, and sense of belonging. For participants, joining a movement may create hope, confidence, solidarity, and a feeling that they can contribute to social change.
+
+For people who have experienced injustice, seeing others raise similar concerns can provide emotional support. Public demonstrations may encourage individuals to speak about problems that were previously ignored or considered difficult to discuss.
+
+![TAKE RESPONSIBILITIES, SAVE STUDENTS.](/images/articles/beyond-slogans-save-students.png)
+
+However, prolonged unrest can also cause stress and uncertainty. Residents may worry about their safety, parents may become concerned about their children’s travel, and workers may fear losing income. Constant exposure to disturbing images or conflicting information online can increase anxiety and confusion.
+
+Protests can sometimes strengthen social divisions, particularly when people begin to treat disagreement as a personal attack. Political, religious, regional, or ideological differences may become more visible, making constructive conversations difficult.
+
+These consequences demonstrate the importance of peaceful communication. People should be able to disagree without resorting to personal abuse, threats, or violence. Listening to opposing viewpoints does not require abandoning one’s own beliefs; it can help people understand the complexity of an issue.
+
+A healthy society is not one in which everyone agrees. It is one in which people can express disagreement while respecting the dignity and rights of others.
+
+### 8. Finding a Balance Between Protest and Public Responsibility
+
+Protests are most effective when they communicate clear demands, remain peaceful, and encourage public participation. Organisers can help by informing authorities about planned gatherings, coordinating with local communities, maintaining emergency access, and communicating accurate information.
+
+Authorities should facilitate peaceful demonstrations rather than treating every gathering as a threat. They can provide suitable locations, clear traffic arrangements, and channels through which protesters can present their demands.
+
+Residents and businesses should also have opportunities to communicate their concerns. Their difficulties should not be ignored simply because a protest has an important social objective.
+
+![BADDIES AREN'T APOLITICAL](/images/articles/beyond-slogans-baddies-apolitical.png)
+
+Citizens can contribute by checking information before sharing it, respecting public property, avoiding violence, and participating in informed discussions. The media can support this process by reporting fairly and providing context.
+
+No single group can solve every problem associated with demonstrations. Cooperation between citizens, organisers, businesses, journalists, and authorities is essential to reduce conflict and encourage constructive outcomes.
+
+### Conclusion: Real People, Real Impact, A Stronger Society
+
+Protests are an important part of democratic life. They give people the opportunity to challenge injustice, question decisions, and demand improvements in society. Many significant social and political changes have been supported by collective public action.
+
+Yet the real impact of a protest cannot be understood by looking only at the slogans, banners, or crowds on the streets. Its consequences extend to students, residents, workers, shopkeepers, families, online audiences, and government institutions.
+
+Recognising these effects does not mean opposing protests. Instead, it means understanding that the right to express disagreement must exist alongside respect for other people’s rights and responsibilities.
+
+A successful protest should not be judged only by the number of people attending it or the attention it receives online. Its deeper value lies in whether it creates awareness, encourages dialogue, influences decision-making, and contributes to meaningful change.
+
+[REAL PEOPLE | REAL IMPACT | A STRONGER, MORE AWARE SOCIETY]`,
   },
 ];
+

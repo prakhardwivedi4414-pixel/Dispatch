@@ -6,16 +6,16 @@ describe('Story Lookup & 404 Status Verification', () => {
   const adminUser: AuthUser = { id: 'admin-1', name: 'Admin', role: 'admin' };
 
   it('retrieves published story by exact slug', async () => {
-    const story = await contentRepository.get('night-shift-of-campus-care');
+    const story = await contentRepository.get('hidden-struggles-du-students-beyond-classroom');
     expect(story).toBeDefined();
-    expect(story?.headline).toContain('The Night Shift of Campus Care');
+    expect(story?.headline).toContain('The Hidden Struggles of DU Students');
     expect(story?.category).toBe('Campus');
   });
 
   it('retrieves story by id fallback', async () => {
-    const story = await contentRepository.get('dispatch-night-shift');
+    const story = await contentRepository.get('dispatch-du-hidden-struggles');
     expect(story).toBeDefined();
-    expect(story?.id).toBe('dispatch-night-shift');
+    expect(story?.id).toBe('dispatch-du-hidden-struggles');
   });
 
   it('returns undefined for non-existent slugs', async () => {

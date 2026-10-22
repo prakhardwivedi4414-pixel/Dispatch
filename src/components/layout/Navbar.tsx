@@ -1,40 +1,62 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useNewsroom } from '../../context/NewsroomContext';
-import { Search, Menu, X, ChevronDown, Compass, ArrowRight } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import {
+  Search, Menu, X, User, LogIn, LogOut, ShieldCheck,
+  ChevronDown, Layers
+} from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { settings, searchQuery, setSearchQuery } = useNewsroom();
-  const [isSectionsOpen, setIsSectionsOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const drawerRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Close menus on route change
   useEffect(() => {
-    setIsSectionsOpen(false);
+    setIsMobileMenuOpen(false);
     setIsSearchOpen(false);
+    setIsUserMenuOpen(false);
   }, [location.pathname, location.search]);
 
   // Keyboard accessibility: Escape to close modals/drawers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setIsSectionsOpen(false);
+        setIsMobileMenuOpen(false);
         setIsSearchOpen(false);
+        setIsUserMenuOpen(false);
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Focus trap / auto-focus for search modal
+  // Click-outside listener for user dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    if (isUserMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isUserMenuOpen]);
+
+  // Auto-focus for search modal
   useEffect(() => {
     if (isSearchOpen) {
-      setTimeout(() => searchInputRef.current?.focus(), 50);
+      const timer = setTimeout(() => searchInputRef.current?.focus(), 60);
+      return () => clearTimeout(timer);
     }
   }, [isSearchOpen]);
 
@@ -46,40 +68,55 @@ export const Navbar: React.FC = () => {
     }
   };
 
-  const primaryLinks = [
+  const handleLogout = async () => {
+    await logout();
+    setIsUserMenuOpen(false);
+    navigate('/', { replace: true });
+  };
+
+  // The 6 clean, verified public destinations required by the brief
+  const primaryDestinations = [
+    { label: 'Home', path: '/' },
     { label: 'Latest', path: '/latest' },
-    { label: 'Long Reads', path: '/long-reads' },
-    { label: 'Short Stories', path: '/short-stories' },
+    { label: 'Features', path: '/features' },
+    { label: 'Campus', path: '/campus' },
     { label: 'Multimedia', path: '/multimedia' },
     { label: 'About', path: '/about' },
   ];
 
-  const categoryBeats = [
-    { label: 'Campus', path: '/section/campus', desc: 'Nocturnal operations, labor, and facilities governance' },
-    { label: 'Society', path: '/section/society', desc: 'Mutual aid, student food security, and community care' },
-    { label: 'Culture', path: '/section/culture', desc: '35mm analog darkroom craft and creative subcultures' },
-    { label: 'Investigations', path: '/section/investigations', desc: 'Archival preservation audits and institutional memory' },
-  ];
+  const isCurrentActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    if (path === '/features') {
+      return location.pathname === '/features' || location.pathname === '/long-reads' || location.pathname === '/short-stories';
+    }
+    if (path === '/campus') {
+      return location.pathname === '/campus' || location.pathname === '/section/campus';
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  const isAdmin = user?.role === 'admin' && user?.name === 'Samridhi';
 
   return (
     <>
-      {/* CALM, SINGLE-ROW EDITORIAL MASTHEAD */}
-      <header className="sticky top-0 z-40 bg-paper-100 border-b border-rule transition-colors">
+      {/* COMPACT, DIGNIFIED EDITORIAL MASTHEAD */}
+      <header className="sticky top-0 z-40 bg-paper-100 border-b border-rule shadow-2xs">
+        {/* Top Tier: Publication Name & Key Controls */}
         <div className="max-w-7xl mx-auto px-4 sm:px-8 h-14 sm:h-16 flex items-center justify-between gap-4">
           
-          {/* Left: Publication Masthead */}
+          {/* Left: Mobile Menu Toggle & Brand Masthead */}
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setIsSectionsOpen(!isSectionsOpen)}
-              className="lg:hidden p-1.5 text-ink-900 hover:text-editorial-red transition-colors"
-              aria-label="Toggle navigation sections"
-              aria-expanded={isSectionsOpen}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-1.5 text-ink-900 hover:text-editorial-red transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMobileMenuOpen}
             >
-              {isSectionsOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            <Link to="/" className="inline-flex items-baseline gap-1 group">
+            <Link to="/" className="inline-flex items-baseline gap-1 group" title="Return to The Dispatch Front Page">
               <span className="font-serif text-2xl sm:text-3xl font-black uppercase tracking-tight text-ink-950 group-hover:text-editorial-red transition-colors">
                 {settings.brandName}
               </span>
@@ -87,165 +124,248 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Center: Primary Editorial Destinations (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-mono uppercase tracking-wider text-ink-700">
-            {primaryLinks.map(link => {
-              const isActive = location.pathname === link.path;
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`py-1 transition-colors hover:text-editorial-red relative ${
-                    isActive ? 'text-editorial-red font-bold' : ''
-                  }`}
-                >
-                  {link.label}
-                  {isActive && (
-                    <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-editorial-red" />
-                  )}
-                </Link>
-              );
-            })}
+          {/* Center: Editorial Tagline & Datestamp (Desktop) */}
+          <div className="hidden md:flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-ink-500">
+            <span>Stories That Matter</span>
+            <span className="text-editorial-red">•</span>
+            <span>Independent Student Newsroom</span>
+          </div>
 
-            {/* Sections Menu Trigger */}
-            <button
-              type="button"
-              onClick={() => setIsSectionsOpen(!isSectionsOpen)}
-              className={`inline-flex items-center gap-1 py-1 transition-colors hover:text-editorial-red ${
-                isSectionsOpen ? 'text-editorial-red font-bold' : ''
-              }`}
-              aria-expanded={isSectionsOpen}
-            >
-              <span>Sections</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isSectionsOpen ? 'rotate-180' : ''}`} />
-            </button>
-          </nav>
-
-          {/* Right: Search Action */}
-          <div className="flex items-center gap-3">
+          {/* Right: Search Action & Authentication Profile */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => setIsSearchOpen(true)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono text-ink-700 hover:text-editorial-red border border-rule hover:border-ink-900 bg-paper-50 transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-mono text-ink-700 hover:text-editorial-red border border-rule hover:border-ink-900 bg-paper-50 transition-colors cursor-pointer"
               aria-label="Open search dialog"
             >
               <Search className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Search</span>
             </button>
+
+            {/* Authenticated Account Menu vs Sign In Link */}
+            {isAuthenticated && user ? (
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-paper-50 border border-ink-950 hover:bg-paper-200 transition-colors cursor-pointer text-xs font-mono"
+                  aria-expanded={isUserMenuOpen}
+                  aria-label="User account menu"
+                >
+                  <div className="w-4 h-4 rounded-full bg-ink-950 text-paper-100 flex items-center justify-center text-[10px] font-bold">
+                    {user.name.charAt(0)}
+                  </div>
+                  <span className="font-bold text-ink-950 max-w-[100px] sm:max-w-[130px] truncate">
+                    {user.name}
+                  </span>
+                  {isAdmin && (
+                    <span className="text-[9px] uppercase tracking-wider bg-editorial-red text-white px-1 py-0.2 rounded-2xs font-bold hidden sm:inline">
+                      Admin
+                    </span>
+                  )}
+                  <ChevronDown className="w-3 h-3 text-ink-500" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-1 w-56 bg-paper-50 border-2 border-ink-950 shadow-xl py-2 z-50 text-xs font-mono">
+                    <div className="px-3 py-2 border-b border-rule">
+                      <span className="text-[10px] uppercase tracking-widest text-ink-500 block">Signed in as</span>
+                      <strong className="text-ink-950 font-serif text-sm block truncate">{user.name}</strong>
+                      <span className="text-[10px] text-editorial-red uppercase tracking-wider font-bold">
+                        {isAdmin ? 'Sole Administrator' : 'Newsroom Contributor'}
+                      </span>
+                    </div>
+
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-ink-800 hover:bg-paper-200 hover:text-editorial-red transition-colors"
+                    >
+                      <User className="w-3.5 h-3.5" />
+                      <span>My Profile & Bylines</span>
+                    </Link>
+
+                    {isAdmin && (
+                      <>
+                        <Link
+                          to="/admin"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-ink-800 hover:bg-paper-200 hover:text-editorial-red transition-colors"
+                        >
+                          <Layers className="w-3.5 h-3.5" />
+                          <span>Editorial CMS Dashboard</span>
+                        </Link>
+                        <Link
+                          to="/admin/contributors"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-ink-800 hover:bg-paper-200 hover:text-editorial-red transition-colors"
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>Manage Contributors</span>
+                        </Link>
+                      </>
+                    )}
+
+                    <div className="border-t border-rule mt-1 pt-1">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-left text-ink-700 hover:bg-red-50 hover:text-editorial-red transition-colors cursor-pointer"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-ink-950 text-white hover:bg-editorial-red transition-colors shadow-2xs"
+                title="Staff Sign In"
+              >
+                <LogIn className="w-3 h-3" />
+                <span>Sign In</span>
+              </Link>
+            )}
           </div>
+        </div>
+
+        {/* Lower Tier: Compact Horizontal Editorial Navigation (Desktop) */}
+        <div className="hidden lg:block border-t border-rule bg-paper-50/80">
+          <nav className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-ink-700">
+            <div className="flex items-center gap-6 py-2">
+              {primaryDestinations.map(item => {
+                const isActive = isCurrentActive(item.path);
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={`py-0.5 transition-colors hover:text-editorial-red relative whitespace-nowrap ${
+                      isActive ? 'text-editorial-red font-bold' : 'text-ink-700'
+                    }`}
+                  >
+                    {item.label}
+                    {isActive && (
+                      <span className="absolute -bottom-2 left-0 right-0 h-0.5 bg-editorial-red" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="text-[10px] text-ink-400 pl-4 py-2 border-l border-rule whitespace-nowrap">
+              Vol. IV • Authentic Dispatches
+            </div>
+          </nav>
         </div>
       </header>
 
-      {/* SECTIONS DISCOVERY DRAWER / MENU PANEL */}
-      {isSectionsOpen && (
+      {/* MOBILE / EXPANDABLE EDITORIAL MENU DRAWER */}
+      {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex justify-start animate-fadeIn"
-          onClick={() => setIsSectionsOpen(false)}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-start animate-fadeIn"
+          onClick={() => setIsMobileMenuOpen(false)}
         >
           <div
-            ref={drawerRef}
             onClick={e => e.stopPropagation()}
-            className="w-full max-w-md h-full bg-paper-100 border-r border-ink-950 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto shadow-2xl"
+            className="w-full max-w-sm h-full bg-paper-100 border-r border-ink-950 p-6 flex flex-col justify-between overflow-y-auto shadow-2xl"
           >
             <div>
-              {/* Drawer Top Header */}
+              {/* Drawer Header */}
               <div className="flex items-center justify-between pb-4 border-b border-rule mb-6">
                 <div>
-                  <span className="dispatch-stamp block mb-1">
-                    INDEX • THE DISPATCH
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-editorial-red font-bold block mb-1">
+                    THE DISPATCH
                   </span>
-                  <h2 className="font-serif text-2xl font-bold text-ink-950">
-                    Editorial Desks
+                  <h2 className="font-serif text-2xl font-black text-ink-950">
+                    Navigation
                   </h2>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setIsSectionsOpen(false)}
-                  className="p-1.5 text-ink-700 hover:text-ink-950 border border-rule hover:border-ink-900 bg-paper-50"
-                  aria-label="Close sections menu"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1.5 text-ink-700 hover:text-ink-950 border border-rule hover:border-ink-900 bg-paper-50 cursor-pointer"
+                  aria-label="Close menu"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Primary Links for Mobile */}
-              <div className="lg:hidden mb-6 pb-6 border-b border-rule">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-ink-500 font-bold block mb-3">
-                  Primary Destinations
-                </span>
-                <ul className="space-y-2">
-                  {primaryLinks.map(link => (
+              {/* Primary Public Pages */}
+              <ul className="space-y-3 font-serif text-lg mb-8">
+                {primaryDestinations.map(link => {
+                  const isActive = isCurrentActive(link.path);
+                  return (
                     <li key={link.path}>
                       <Link
                         to={link.path}
-                        className="font-serif text-lg font-bold text-ink-950 hover:text-editorial-red block transition-colors"
+                        className={`block transition-colors hover:text-editorial-red py-1 ${
+                          isActive ? 'text-editorial-red font-bold border-l-2 border-editorial-red pl-2' : 'text-ink-950'
+                        }`}
                       >
                         {link.label}
                       </Link>
                     </li>
-                  ))}
-                </ul>
-              </div>
+                  );
+                })}
+              </ul>
 
-              {/* Reporting Categories */}
-              <div className="mb-6">
+              {/* Authenticated Staff Tools in Drawer */}
+              <div className="pt-6 border-t border-rule">
                 <span className="text-[10px] font-mono uppercase tracking-widest text-ink-500 font-bold block mb-3">
-                  Reporting Desks
+                  Newsroom Staff
                 </span>
-                <div className="space-y-2">
-                  {categoryBeats.map(beat => {
-                    const isActive = location.pathname === beat.path;
-                    return (
+                {isAuthenticated && user ? (
+                  <div className="space-y-2 font-mono text-xs">
+                    <div className="p-3 bg-paper-200 border border-rule mb-2">
+                      <span className="text-[10px] text-ink-500 block">Logged in as</span>
+                      <strong className="text-ink-950 font-serif text-sm block">{user.name}</strong>
+                      <span className="text-[10px] text-editorial-red font-bold">{user.role}</span>
+                    </div>
+                    <Link
+                      to="/profile"
+                      className="block p-2 bg-paper-50 border border-rule hover:border-ink-950 transition-colors"
+                    >
+                      My Profile & Bylines
+                    </Link>
+                    {isAdmin && (
                       <Link
-                        key={beat.path}
-                        to={beat.path}
-                        className={`block p-3 border transition-colors ${
-                          isActive
-                            ? 'bg-paper-200 border-editorial-red'
-                            : 'bg-paper-50 border-rule hover:border-ink-950'
-                        }`}
+                        to="/admin"
+                        className="block p-2 bg-ink-950 text-white hover:bg-editorial-red transition-colors"
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="font-serif font-bold text-ink-950 text-base">
-                            {beat.label}
-                          </span>
-                          <ArrowRight className="w-3.5 h-3.5 text-ink-400" />
-                        </div>
-                        <p className="text-xs text-ink-600 font-sans mt-0.5">
-                          {beat.desc}
-                        </p>
+                        CMS Dashboard
                       </Link>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Look Closer under Investigations as methodology explainer */}
-              <div className="pt-4 border-t border-rule">
-                <Link
-                  to="/look-closer"
-                  className="block p-3 bg-paper-200 border border-rule hover:border-ink-950 transition-colors"
-                >
-                  <div className="flex items-center gap-2 text-xs font-mono uppercase text-editorial-red font-bold mb-1">
-                    <Compass className="w-3.5 h-3.5" />
-                    <span>Investigations Lab</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full text-left p-2 text-editorial-red hover:underline cursor-pointer"
+                    >
+                      Sign Out
+                    </button>
                   </div>
-                  <h3 className="font-serif text-sm font-bold text-ink-950">
-                    Look Closer: Fieldwork & Evidence Explorer
-                  </h3>
-                  <p className="text-xs text-ink-600 mt-1">
-                    Annotated documentary photographs, nocturnal shift timeline, and reporting methodology.
-                  </p>
-                </Link>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-ink-950 text-white hover:bg-editorial-red font-mono text-xs uppercase tracking-wider font-bold transition-colors w-full justify-center"
+                  >
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Staff Sign In</span>
+                  </Link>
+                )}
               </div>
             </div>
 
             {/* Drawer Bottom */}
             <div className="pt-6 border-t border-rule text-xs font-mono text-ink-500 flex items-center justify-between">
-              <span>{settings.editionLabel}</span>
+              <span>{settings.brandName}</span>
               <Link to="/about" className="hover:text-editorial-red underline">
-                Newsroom Mission
+                About Newsroom
               </Link>
             </div>
           </div>
@@ -259,11 +379,11 @@ export const Navbar: React.FC = () => {
           onClick={() => setIsSearchOpen(false)}
         >
           <div
-            className="w-full max-w-xl bg-paper-100 border border-ink-950 shadow-2xl p-6"
+            className="w-full max-w-xl bg-paper-100 border-2 border-ink-950 shadow-2xl p-6"
             onClick={e => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
-            aria-label="Search stories"
+            aria-label="Search dispatches"
           >
             <div className="flex items-center justify-between pb-3 border-b border-rule mb-4">
               <span className="font-serif text-lg font-bold text-ink-950 flex items-center gap-2">
@@ -273,7 +393,7 @@ export const Navbar: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(false)}
-                className="text-ink-600 hover:text-ink-950 p-1"
+                className="text-ink-600 hover:text-ink-950 p-1 cursor-pointer"
                 aria-label="Close search"
               >
                 <X className="w-4 h-4" />
@@ -294,13 +414,13 @@ export const Navbar: React.FC = () => {
 
               <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-ink-600">
                 <span className="font-mono text-[11px] text-ink-500">
-                  Press Enter to search
+                  Search across all published investigations, photo features, and dispatches
                 </span>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-ink-950 hover:bg-editorial-red text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+                  className="px-4 py-2 bg-ink-950 hover:bg-editorial-red text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 >
-                  Search
+                  Search Dispatches
                 </button>
               </div>
             </form>

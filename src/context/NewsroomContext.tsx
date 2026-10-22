@@ -30,7 +30,7 @@ const STORAGE_KEY_SETTINGS = 'the_dispatch_public_settings_v5';
 const DEFAULT_SETTINGS: NewsroomSettings = {
   brandName: 'The Dispatch',
   tagline: 'Stories That Matter',
-  editorName: 'Siya',
+  editorName: 'Samridhi',
   editionLabel: 'Independent Multimedia Edition',
 };
 

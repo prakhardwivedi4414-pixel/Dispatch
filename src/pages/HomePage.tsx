@@ -5,7 +5,7 @@ import { CinematicHero } from '../components/story/CinematicHero';
 import { HorizontalStoryRail } from '../components/story/HorizontalStoryRail';
 import { SpatialStoryOrbit } from '../components/story/SpatialStoryOrbit';
 import { StoryCard } from '../components/story/StoryCard';
-import { ArrowRight, BookOpen, Eye } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
   const { stories, settings } = useNewsroom();
@@ -14,15 +14,17 @@ export const HomePage: React.FC = () => {
     document.title = 'The Dispatch — Stories That Matter';
   }, []);
 
-  // Filter published stories
+  // Filter published stories: prioritize the 4 real PDF articles
   const publishedStories = stories.filter(s => s.status === 'published');
+  const activeEditorialStories = publishedStories.filter(s => !s.isDemo);
+  const coreStories = activeEditorialStories.length >= 4 ? activeEditorialStories : publishedStories;
 
   // Lead featured story and secondary dispatches
-  const featuredStory = publishedStories.find(s => s.isLead) || publishedStories[0];
-  const remainingStories = publishedStories.filter(s => s.id !== featuredStory?.id);
-  const secondaryLead = remainingStories[0];
-  const shortStories = remainingStories.filter(s => s.format === 'short' || s.format === 'photo');
-  const multimediaStories = publishedStories.filter(s => s.format === 'audio' || s.format === 'video' || s.format === 'photo');
+  const featuredStory = coreStories.find(s => s.isLead) || coreStories[0];
+  const remainingStories = coreStories.filter(s => s.id !== featuredStory?.id);
+  const secondaryLead = remainingStories.find(s => s.id === 'dispatch-beyond-the-slogans') || remainingStories[0];
+  const shortStories = remainingStories.filter(s => s.id !== secondaryLead?.id);
+  const multimediaStories = coreStories.filter(s => s.format === 'photo' || s.format === 'audio' || s.format === 'video');
 
   return (
     <div className="min-h-screen pb-16">
@@ -50,12 +52,13 @@ export const HomePage: React.FC = () => {
       )}
 
       {/* 3. HORIZONTAL STORY RAIL: PARABOLIC ENTRANCE & ALTERNATING RHYTHM */}
-      <HorizontalStoryRail stories={publishedStories} />
+      <HorizontalStoryRail stories={coreStories} />
 
       {/* 4. SIGNATURE FEATURE: THE DISPATCH ORBIT (Organic 3D field on paper palette) */}
-      <SpatialStoryOrbit stories={publishedStories} />
+      <SpatialStoryOrbit stories={coreStories} />
 
       {/* 5. EDITORIAL GRID: LATEST REPORTING & DESKS */}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-16">
         <section className="mb-16" aria-label="Latest In-Depth Reporting">
           <div className="flex items-end justify-between pb-3 border-b-2 border-ink-950 mb-8">
@@ -111,45 +114,18 @@ export const HomePage: React.FC = () => {
           </div>
         </section>
 
-        {/* 6. INTERACTIVE JOURNALISM LAB (LOOK CLOSER TEASER) */}
-        <section className="mb-16 bg-paper-100 border-2 border-ink-950 p-8 shadow-xs" aria-label="Interactive Journalism Teaser">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-8">
-              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-editorial-red font-bold mb-2">
-                <Eye className="w-4 h-4" />
-                <span>Fieldwork & Methodology</span>
-              </div>
-              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-ink-950 mb-3">
-                Look Closer: Fieldwork, Data & Evidence
-              </h3>
-              <p className="font-serif text-base text-ink-700 leading-relaxed max-w-2xl">
-                Explore the documentary evidence behind the reporting: inspect annotated cleanroom photographs with hotspot field notes, examine the nocturnal 11 PM – 7 AM shift chronology, and test your headline verification skills.
-              </p>
-            </div>
-            <div className="lg:col-span-4 flex lg:justify-end">
-              <Link
-                to="/look-closer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-ink-950 text-paper-100 hover:bg-editorial-red font-mono text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
-              >
-                <span>Launch Interactive Explorer</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* 7. MULTIMEDIA SECTION */}
+        {/* 6. MULTIMEDIA & VISUAL JOURNALISM */}
         <section className="my-16" aria-label="Multimedia Showcase">
           <div className="flex items-center justify-between pb-3 border-b-2 border-ink-950 mb-6">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-1.5 h-1.5 bg-editorial-red inline-block" />
                 <span className="text-xs font-mono uppercase tracking-widest text-editorial-red font-bold">
-                  Audio, Video & Photography Desks
+                  Documentary Photography & Visual Features
                 </span>
               </div>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-ink-950">
-                Multimedia Journalism
+                Visual Journalism & Fieldwork
               </h2>
             </div>
             <Link
@@ -161,8 +137,8 @@ export const HomePage: React.FC = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {multimediaStories.slice(0, 3).map(story => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {multimediaStories.slice(0, 2).map(story => (
               <StoryCard key={story.id} story={story} variant="secondary" />
             ))}
           </div>

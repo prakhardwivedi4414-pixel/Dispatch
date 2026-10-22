@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { contentRepository } from '../../services/contentRepository';
 import { Story, StoryCategory, StoryFormat, StoryStatus, Contributor } from '../../types';
 import { countWords, computeReadingTime, validateStory } from '../../utils/validation';
 import {
-  Save, Eye, ArrowLeft, CheckCircle2
+  Save, Eye, ArrowLeft, CheckCircle2, Award, Star, AlertTriangle
 } from 'lucide-react';
 
 export const StoryEditorPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/editorial';
 
   const isNew = !id || id === 'new';
   const isEditorOrAdmin = user?.role === 'editor' || user?.role === 'admin';
@@ -35,6 +37,8 @@ export const StoryEditorPage: React.FC = () => {
   const [coverAlt, setCoverAlt] = useState('');
   const [coverCredit, setCoverCredit] = useState('');
   const [coverCaption, setCoverCaption] = useState('');
+  const [coverSource, setCoverSource] = useState('Pinterest (Provisional reference)');
+  const [isVerifiedSource, setIsVerifiedSource] = useState(false);
 
   // Media
   const [mediaType, setMediaType] = useState<'audio' | 'video' | 'gallery' | 'none'>('none');
@@ -42,9 +46,18 @@ export const StoryEditorPage: React.FC = () => {
   const [mediaDuration, setMediaDuration] = useState('');
   const [transcript, setTranscript] = useState('');
 
-  // Authors
+  // Source PDF Document & Facsimile Pages
+  const [sourcePdfFilename, setSourcePdfFilename] = useState('');
+  const [sourcePdfUrl, setSourcePdfUrl] = useState('');
+  const [sourcePdfSize, setSourcePdfSize] = useState<number>(0);
+  const [sourcePdfPages, setSourcePdfPages] = useState<number>(0);
+  const [pdfPagesList, setPdfPagesList] = useState<string[]>([]);
+
+  // Authors & Attribution Roles
   const [allContributors, setAllContributors] = useState<Contributor[]>([]);
-  const [selectedAuthorIds, setSelectedAuthorIds] = useState<string[]>(['siya']);
+  const [selectedAuthorIds, setSelectedAuthorIds] = useState<string[]>(['samridhi']);
+  const [authorRoles, setAuthorRoles] = useState<Record<string, string>>({});
+  const [primaryAuthorId, setPrimaryAuthorId] = useState<string>('samridhi');
 
   // Editor UI State
   const [saveStatus, setSaveStatus] = useState<'idle' | 'unsaved' | 'saving' | 'saved' | 'error'>('idle');
@@ -85,6 +98,19 @@ export const StoryEditorPage: React.FC = () => {
         setCoverAlt(story.cover.alt);
         setCoverCredit(story.cover.credit);
         setCoverCaption(story.cover.caption);
+        setCoverSource(story.cover.source || (story.cover.credit?.toLowerCase().includes('pinterest') ? 'Pinterest (Provisional reference)' : 'Original Fieldwork'));
+        setIsVerifiedSource(story.cover.isVerifiedSource ?? false);
+
+        if (story.sourcePdf) {
+          setSourcePdfFilename(story.sourcePdf.filename);
+          setSourcePdfUrl(story.sourcePdf.url);
+          setSourcePdfSize(story.sourcePdf.sizeBytes);
+          setSourcePdfPages(story.sourcePdf.pageCount);
+        }
+        if (story.pdfPages) {
+          setPdfPagesList(story.pdfPages);
+        }
+
 
         if (story.media) {
           setMediaType(story.media.type);
@@ -94,9 +120,17 @@ export const StoryEditorPage: React.FC = () => {
         }
 
         setSelectedAuthorIds(story.authors.map(a => a.id));
+        const roles: Record<string, string> = {};
+        let primary = '';
+        story.authors.forEach(a => {
+          roles[a.id] = a.contributionRole || a.role || 'Reporter / Writer';
+          if (a.isPrimary) primary = a.id;
+        });
+        setAuthorRoles(roles);
+        setPrimaryAuthorId(primary || (story.authors[0] ? story.authors[0].id : 'samridhi'));
       });
     }
-  }, [id, isNew, navigate, user]);
+  }, [id, isNew, navigate, user, basePath]);
 
   const handleFieldChange = () => {
     if (saveStatus !== 'unsaved') {
@@ -139,11 +173,22 @@ export const StoryEditorPage: React.FC = () => {
 
     const targetStatus = explicitStatus || status;
 
-    // Build author objects
-    const assignedAuthors = allContributors.filter(c => selectedAuthorIds.includes(c.id));
+    // Build author objects with explicit roles and primary byline
+    const assignedAuthors = allContributors
+      .filter(c => selectedAuthorIds.includes(c.id))
+      .map(c => ({
+        ...c,
+        isPrimary: c.id === primaryAuthorId || (selectedAuthorIds[0] === c.id && !primaryAuthorId),
+        contributionRole: authorRoles[c.id] || c.role || 'Reporter / Writer',
+      }));
+
     if (assignedAuthors.length === 0) {
-      const defaultAuthor = allContributors[0] || { id: 'siya', name: 'Siya', role: 'Reporter' };
-      assignedAuthors.push(defaultAuthor);
+      const defaultAuthor = allContributors[0] || { id: 'samridhi', name: 'Samridhi', role: 'Editor', isPrimary: true };
+      assignedAuthors.push({
+        ...defaultAuthor,
+        isPrimary: true,
+        contributionRole: defaultAuthor.role || 'Senior Editor',
+      });
     }
 
     const storySlug = headline
@@ -167,8 +212,10 @@ export const StoryEditorPage: React.FC = () => {
       cover: {
         src: coverSrc || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1600&q=80',
         alt: coverAlt || headline,
-        credit: coverCredit || 'The Dispatch Visual Desk',
+        credit: coverCredit || 'Reference photograph (Pinterest / Archival)',
         caption: coverCaption || '',
+        source: coverSource,
+        isVerifiedSource,
       },
       media: mediaType !== 'none' ? {
         type: mediaType,
@@ -176,20 +223,29 @@ export const StoryEditorPage: React.FC = () => {
         duration: mediaDuration,
         transcript: transcript,
       } : undefined,
+      sourcePdf: sourcePdfFilename ? {
+        filename: sourcePdfFilename,
+        url: sourcePdfUrl,
+        sizeBytes: sourcePdfSize,
+        pageCount: sourcePdfPages,
+      } : undefined,
+      pdfPages: pdfPagesList.length > 0 ? pdfPagesList : undefined,
       isLead,
       isDemo,
     };
+
 
     try {
       await contentRepository.save(storyData, user);
       setSaveStatus('saved');
       setLastSavedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
       if (isNew) {
-        navigate(`/editorial/edit/${storyData.id}`, { replace: true });
+        navigate(`${basePath}/edit/${storyData.id}`, { replace: true });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSaveStatus('error');
-      setErrorMessage(err.message || 'Failed to save dispatch to local storage.');
+      const msg = err instanceof Error ? err.message : 'Save failed';
+      setErrorMessage(msg);
     }
   };
 
@@ -209,7 +265,7 @@ export const StoryEditorPage: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-6 border-b-2 border-ink-950">
         <div className="flex items-center gap-3">
           <Link
-            to="/editorial"
+            to={basePath}
             className="p-2 bg-paper-100 border border-rule hover:border-ink-950 text-ink-700 transition-colors cursor-pointer"
             title="Back to Dashboard"
           >
@@ -547,35 +603,115 @@ export const StoryEditorPage: React.FC = () => {
             </div>
 
             {/* Byline / Authors Selection */}
-            <div className="p-5 bg-paper-50 border border-rule space-y-3">
-              <span className="text-xs font-mono uppercase tracking-wider text-ink-950 font-bold block border-b border-rule pb-2">
-                Reporting Byline & Authors
-              </span>
+            <div className="p-5 bg-paper-50 border border-rule space-y-4">
+              <div className="flex items-center justify-between border-b border-rule pb-2">
+                <span className="text-xs font-mono uppercase tracking-wider text-ink-950 font-bold">
+                  Reporting Byline & Production Attribution
+                </span>
+                <Link
+                  to={`${basePath}/contributors`}
+                  className="text-[11px] font-mono text-editorial-red hover:underline"
+                >
+                  Manage Roster →
+                </Link>
+              </div>
+
               <p className="text-[11px] text-ink-600 font-sans">
-                Select reporters attributed to this dispatch:
+                Assign contributors from the newsroom roster and specify their specific reporting or production role:
               </p>
-              <div className="space-y-2">
-                {allContributors.map(contrib => (
-                  <label key={contrib.id} className="flex items-start gap-2 text-xs font-mono cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedAuthorIds.includes(contrib.id)}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          setSelectedAuthorIds([...selectedAuthorIds, contrib.id]);
-                        } else {
-                          setSelectedAuthorIds(selectedAuthorIds.filter(id => id !== contrib.id));
-                        }
-                        handleFieldChange();
-                      }}
-                      className="mt-0.5"
-                    />
-                    <div>
-                      <span className="font-bold text-ink-950">{contrib.name}</span>
-                      <span className="text-ink-500 block text-[10px]">{contrib.role}</span>
+
+              <div className="space-y-3">
+                {allContributors.map(contrib => {
+                  const isChecked = selectedAuthorIds.includes(contrib.id);
+                  const isPrimary = primaryAuthorId === contrib.id;
+                  const currentRole = authorRoles[contrib.id] || contrib.role || 'Reporter / Writer';
+
+                  return (
+                    <div
+                      key={contrib.id}
+                      className={`p-3 border transition-colors ${
+                        isChecked ? 'bg-paper-100 border-ink-950' : 'bg-paper-50 border-rule'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <label className="flex items-start gap-2.5 text-xs font-mono cursor-pointer flex-grow">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={e => {
+                              if (e.target.checked) {
+                                setSelectedAuthorIds([...selectedAuthorIds, contrib.id]);
+                                if (!primaryAuthorId) setPrimaryAuthorId(contrib.id);
+                              } else {
+                                const next = selectedAuthorIds.filter(id => id !== contrib.id);
+                                setSelectedAuthorIds(next);
+                                if (primaryAuthorId === contrib.id) {
+                                  setPrimaryAuthorId(next[0] || '');
+                                }
+                              }
+                              handleFieldChange();
+                            }}
+                            className="mt-0.5 text-editorial-red focus:ring-editorial-red"
+                          />
+                          <div>
+                            <span className="font-serif font-bold text-ink-950 text-sm block">
+                              {contrib.name}
+                            </span>
+                            <span className="text-ink-500 text-[10px] block">
+                              Roster Title: {contrib.role}
+                            </span>
+                          </div>
+                        </label>
+
+                        {isChecked && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPrimaryAuthorId(contrib.id);
+                              handleFieldChange();
+                            }}
+                            className={`px-2 py-0.5 text-[10px] font-mono uppercase font-bold border transition-colors cursor-pointer flex items-center gap-1 ${
+                              isPrimary
+                                ? 'bg-editorial-red text-white border-editorial-red'
+                                : 'bg-paper-200 text-ink-700 border-rule hover:border-ink-950'
+                            }`}
+                          >
+                            <Star className="w-2.5 h-2.5 fill-current" />
+                            <span>{isPrimary ? 'Primary Byline' : 'Set as Primary'}</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Specific contribution role selector */}
+                      {isChecked && (
+                        <div className="mt-2.5 pt-2 border-t border-rule flex items-center gap-2">
+                          <span className="text-[11px] font-mono text-ink-600 flex items-center gap-1">
+                            <Award className="w-3 h-3 text-editorial-red" />
+                            Role on this Story:
+                          </span>
+                          <select
+                            value={currentRole}
+                            onChange={e => {
+                              setAuthorRoles(prev => ({
+                                ...prev,
+                                [contrib.id]: e.target.value,
+                              }));
+                              handleFieldChange();
+                            }}
+                            className="bg-paper-50 border border-rule px-2 py-1 text-xs font-mono text-ink-950 focus:outline-hidden"
+                          >
+                            <option value="Reporter / Writer">Reporter / Writer</option>
+                            <option value="Photographer">Photographer</option>
+                            <option value="Videographer">Videographer</option>
+                            <option value="Audio Producer">Audio Producer</option>
+                            <option value="Editor">Editor</option>
+                            <option value="Researcher">Researcher</option>
+                          </select>
+                        </div>
+                      )}
                     </div>
-                  </label>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -617,7 +753,7 @@ export const StoryEditorPage: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor="coverCredit" className="block text-[11px] font-mono text-ink-600 mb-1">Photo Credit:</label>
+                <label htmlFor="coverCredit" className="block text-[11px] font-mono text-ink-600 mb-1">Photo Credit / Attribution:</label>
                 <input
                   id="coverCredit"
                   type="text"
@@ -626,10 +762,51 @@ export const StoryEditorPage: React.FC = () => {
                     setCoverCredit(e.target.value);
                     handleFieldChange();
                   }}
-                  placeholder="Maya Chen / The Dispatch"
+                  placeholder="e.g. Reference photograph (Pinterest) or verified photographer"
                   className="w-full p-2 bg-paper-100 border border-rule text-xs font-mono"
                 />
               </div>
+
+              <div>
+                <label htmlFor="coverSource" className="block text-[11px] font-mono text-ink-600 mb-1">Image Source / Provenance:</label>
+                <input
+                  id="coverSource"
+                  type="text"
+                  value={coverSource}
+                  onChange={e => {
+                    setCoverSource(e.target.value);
+                    handleFieldChange();
+                  }}
+                  placeholder="e.g. Pinterest (Provisional reference) or Fieldwork"
+                  className="w-full p-2 bg-paper-100 border border-rule text-xs font-mono"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  id="isVerifiedSource"
+                  type="checkbox"
+                  checked={isVerifiedSource}
+                  onChange={e => {
+                    setIsVerifiedSource(e.target.checked);
+                    handleFieldChange();
+                  }}
+                  className="text-editorial-red focus:ring-editorial-red cursor-pointer"
+                />
+                <label htmlFor="isVerifiedSource" className="text-xs font-mono text-ink-800 cursor-pointer">
+                  Verified Original Newsroom Photography
+                </label>
+              </div>
+
+              {(!isVerifiedSource || coverSource.toLowerCase().includes('pinterest')) && (
+                <div className="p-3 bg-amber-50 border-l-4 border-amber-600 text-xs font-mono text-amber-900 leading-relaxed">
+                  <div className="font-bold flex items-center gap-1 mb-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Unverified Image Advisory</span>
+                  </div>
+                  <span>This photograph is flagged as sourced from Pinterest or external reference. Retained temporarily for prototype; do not attribute to named contributors without verification.</span>
+                </div>
+              )}
 
               <div>
                 <label htmlFor="coverCaption" className="block text-[11px] font-mono text-ink-600 mb-1">Caption:</label>
@@ -647,9 +824,77 @@ export const StoryEditorPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Original Source PDF Document Panel */}
+            <div className="p-4 bg-paper-100 border border-rule space-y-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-ink-950 font-bold block border-b border-rule pb-2 flex items-center justify-between">
+                <span>Original Source PDF</span>
+                {sourcePdfFilename && <span className="text-editorial-red text-[10px]">Attached</span>}
+              </span>
+
+              <div>
+                <label htmlFor="sourcePdfFilename" className="block text-[11px] font-mono text-ink-600 mb-1">PDF Filename:</label>
+                <input
+                  id="sourcePdfFilename"
+                  type="text"
+                  value={sourcePdfFilename}
+                  onChange={e => {
+                    setSourcePdfFilename(e.target.value);
+                    handleFieldChange();
+                  }}
+                  placeholder="e.g. long story.pdf"
+                  className="w-full p-2 bg-paper-100 border border-rule text-xs font-mono"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="sourcePdfUrl" className="block text-[11px] font-mono text-ink-600 mb-1">Document URL:</label>
+                <input
+                  id="sourcePdfUrl"
+                  type="text"
+                  value={sourcePdfUrl}
+                  onChange={e => {
+                    setSourcePdfUrl(e.target.value);
+                    handleFieldChange();
+                  }}
+                  placeholder="/documents/long story.pdf"
+                  className="w-full p-2 bg-paper-100 border border-rule text-xs font-mono"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label htmlFor="sourcePdfSize" className="block text-[11px] font-mono text-ink-600 mb-1">File Size (bytes):</label>
+                  <input
+                    id="sourcePdfSize"
+                    type="number"
+                    value={sourcePdfSize || ''}
+                    onChange={e => {
+                      setSourcePdfSize(Number(e.target.value));
+                      handleFieldChange();
+                    }}
+                    className="w-full p-2 bg-paper-100 border border-rule text-xs font-mono"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="sourcePdfPages" className="block text-[11px] font-mono text-ink-600 mb-1">Page Count:</label>
+                  <input
+                    id="sourcePdfPages"
+                    type="number"
+                    value={sourcePdfPages || ''}
+                    onChange={e => {
+                      setSourcePdfPages(Number(e.target.value));
+                      handleFieldChange();
+                    }}
+                    className="w-full p-2 bg-paper-100 border border-rule text-xs font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Validation Checklist Card */}
             <div className="p-4 bg-paper-100 border border-rule text-xs font-mono">
               <span className="font-bold text-ink-950 block mb-2 uppercase">Editorial Readiness:</span>
+
               <ul className="space-y-1">
                 {validation.issues.map((iss, i) => (
                   <li key={i} className={`flex items-start gap-1.5 ${

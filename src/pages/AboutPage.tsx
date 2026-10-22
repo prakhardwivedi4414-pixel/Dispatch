@@ -26,14 +26,14 @@ export const AboutPage: React.FC = () => {
           Independent Journalism Grounded in Truth, Craft & Rigor
         </h1>
         <p className="font-serif text-xl text-ink-700 leading-relaxed">
-          <em>{settings.brandName}</em> is an independent, student-led digital publication founded by Siya and student collaborators, dedicated to long-form investigative journalism and multimedia reporting.
+          <em>{settings.brandName}</em> is an independent, student-led digital publication dedicated to in-depth investigative journalism, documentary photography, and multimedia storytelling.
         </p>
       </div>
 
       {/* Mission & Purpose */}
       <section className="space-y-6 text-base sm:text-lg font-serif text-ink-850 leading-relaxed mb-12">
         <p>
-          Founded on the conviction that communities deserve investigative depth rather than surface press releases, <em>The Dispatch</em> combines rigorous documentary fieldwork with modern multimedia storytelling. Our reporting scrutinizes institutional governance, labor conditions, community mutual aid, and artistic subcultures across audio, visual, and written forms.
+          Founded on the conviction that communities deserve investigative depth rather than superficial press releases, <em>The Dispatch</em> combines rigorous documentary fieldwork with modern multimedia storytelling. Our reporting scrutinizes institutional governance, labor conditions, community mutual aid, and artistic subcultures across audio, visual, and written forms.
         </p>
 
         <p>
@@ -41,21 +41,24 @@ export const AboutPage: React.FC = () => {
         </p>
       </section>
 
-      {/* Demonstrative Reporting Notice */}
-      <section className="bg-paper-100 border border-ink-950 p-6 sm:p-8 mb-12" aria-label="Illustrative Content Note">
+      {/* Editorial Independence and Transparency Note */}
+      <section className="bg-paper-100 border border-ink-950 p-6 sm:p-8 mb-12" aria-label="Editorial Transparency Note">
         <div className="flex items-center gap-2.5 mb-3">
           <Info className="w-5 h-5 text-editorial-red flex-shrink-0" />
           <h2 className="font-serif text-2xl font-bold text-ink-950">
-            Illustrative & Demonstrative Content Note
+            Editorial Independence & Transparency Notice
           </h2>
         </div>
 
         <p className="text-sm text-ink-700 font-serif leading-relaxed mb-4">
-          <em>The Dispatch</em> is a student journalism publication designed to demonstrate professional multimedia reporting practices. All dispatches, photographic frames, audio pieces, and source ledgers published on this platform are created for demonstrative and portfolio review purposes.
+          <em>The Dispatch</em> is an independent student publication publishing original student reporting and multimedia journalism. Dispatches adhere to strict verification standards and transparent attribution.
+        </p>
+        <p className="text-sm text-ink-700 font-serif leading-relaxed mb-4">
+          <strong>Document & Visual Sourcing:</strong> All published dispatches are derived directly from verified reporting documents. Original photographs and illustrations are preserved faithfully with verifiable attribution and source links.
         </p>
         <div className="flex items-center gap-2 text-xs font-mono text-ink-600 bg-paper-200 p-3 border border-rule">
           <ShieldCheck className="w-4 h-4 text-editorial-red flex-shrink-0" />
-          <span>Demonstration stories are flagged with <code className="text-editorial-red font-bold">isDemo: true</code> in the editorial system.</span>
+          <span>Independent editorial reporting published under student press standards and verification.</span>
         </div>
       </section>
 
@@ -68,52 +71,42 @@ export const AboutPage: React.FC = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-          <div className="p-5 bg-paper-50 border border-rule">
-            <div className="flex justify-between items-baseline mb-2">
-              <strong className="font-serif text-lg text-ink-950">Siya</strong>
-              <span className="text-xs font-mono uppercase text-editorial-red font-bold">
-                Editor-in-Chief & Lead Reporter
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+          {/* Administrator */}
+          <div className="p-5 bg-paper-50 border-2 border-ink-950 sm:col-span-2">
+            <div className="flex flex-wrap justify-between items-baseline gap-2 mb-2">
+              <strong className="font-serif text-xl text-ink-950">Samridhi</strong>
+              <span className="text-xs font-mono uppercase bg-editorial-red text-white px-2 py-0.5 font-bold">
+                Administrator & Editorial Lead
               </span>
             </div>
             <p className="text-xs text-ink-700 leading-relaxed font-sans">
-              Directs editorial assignments, leads fieldwork investigations on nocturnal labor and community mutual aid, co-hosts the investigative podcast, and coordinates reporting verification.
+              Oversees newsroom administration, verifies reporting attribution, directs cross-desk editorial standards, and manages publishing permissions.
+            </p>
+          </div>
+
+          {/* Confirmed Contributors */}
+          <div className="p-5 bg-paper-50 border border-rule">
+            <div className="flex justify-between items-baseline mb-2">
+              <strong className="font-serif text-lg text-ink-950">Arpita Singh</strong>
+              <span className="text-xs font-mono uppercase text-editorial-red font-bold">
+                Contributor
+              </span>
+            </div>
+            <p className="text-xs text-ink-600 font-mono">
+              The Dispatch Contributing Staff
             </p>
           </div>
 
           <div className="p-5 bg-paper-50 border border-rule">
             <div className="flex justify-between items-baseline mb-2">
-              <strong className="font-serif text-lg text-ink-950">Maya Chen</strong>
+              <strong className="font-serif text-lg text-ink-950">Kirti</strong>
               <span className="text-xs font-mono uppercase text-editorial-red font-bold">
-                Head of Visuals & Photography
+                Contributor
               </span>
             </div>
-            <p className="text-xs text-ink-700 leading-relaxed font-sans">
-              Director of documentary photography, managing low-light film and digital capture, negative development, color grading, and visual attribution standards.
-            </p>
-          </div>
-
-          <div className="p-5 bg-paper-50 border border-rule">
-            <div className="flex justify-between items-baseline mb-2">
-              <strong className="font-serif text-lg text-ink-950">Liam O’Connor</strong>
-              <span className="text-xs font-mono uppercase text-editorial-red font-bold">
-                Audio Producer & Video Director
-              </span>
-            </div>
-            <p className="text-xs text-ink-700 leading-relaxed font-sans">
-              Engineers multi-track studio audio, masters broadcast sound design, operates field video cinematography, and edits short-form documentary packages.
-            </p>
-          </div>
-
-          <div className="p-5 bg-paper-50 border border-rule">
-            <div className="flex justify-between items-baseline mb-2">
-              <strong className="font-serif text-lg text-ink-950">Marcus Vance & Priya Patel</strong>
-              <span className="text-xs font-mono uppercase text-editorial-red font-bold">
-                Fact-Checking & Archival Research
-              </span>
-            </div>
-            <p className="text-xs text-ink-700 leading-relaxed font-sans">
-              Conducts independent source verification, public record FOI requests, data cross-checks, and statistical validation across all published stories.
+            <p className="text-xs text-ink-600 font-mono">
+              The Dispatch Contributing Staff
             </p>
           </div>
         </div>
@@ -128,7 +121,15 @@ export const AboutPage: React.FC = () => {
           For newsroom inquiries, corrections, or source inquiries:
         </p>
         <div className="font-mono text-ink-900 space-y-1">
-          <p>Email: <span className="text-editorial-red">editorial@thedispatch.internal</span></p>
+          <p>
+            Email:{' '}
+            <a
+              href="mailto:samridhiaug@gmail.com"
+              className="text-editorial-red hover:underline font-bold"
+            >
+              samridhiaug@gmail.com
+            </a>
+          </p>
           <p>Newsroom: Student Media Center, Room 304</p>
         </div>
       </section>

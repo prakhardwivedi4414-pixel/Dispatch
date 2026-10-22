@@ -93,7 +93,7 @@ export const ScriptViewer: React.FC<ScriptViewerProps> = ({
         <div className="p-5 md:p-8">
           <div className="text-xs uppercase tracking-widest font-mono text-ink-500 mb-3 pb-2 border-b border-rule flex justify-between items-center">
             <span>Verified Broadcast Manuscript</span>
-            <span className="text-editorial-red font-semibold">Official Assignment Submission Asset</span>
+            <span className="text-ink-500 font-medium">Fieldwork Record</span>
           </div>
 
           <pre className="font-mono text-xs sm:text-sm text-ink-900 whitespace-pre-wrap leading-relaxed max-h-[500px] overflow-y-auto p-4 bg-paper-50 border border-rule">

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { useNewsroom } from '../context/NewsroomContext';
 import { StoryCard } from '../components/story/StoryCard';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
@@ -9,9 +9,12 @@ import { StoryFormat } from '../types';
 export const SectionPage: React.FC = () => {
   const { category, sectionName } = useParams<{ category?: string; sectionName?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const { stories } = useNewsroom();
 
-  const activeSection = (category || sectionName || 'latest').toLowerCase();
+  const pathSegment = location.pathname.split('/')[1] || 'latest';
+  const rawSection = category || sectionName || (pathSegment === 'section' ? location.pathname.split('/')[2] : pathSegment) || 'latest';
+  const activeSection = rawSection.toLowerCase();
   const queryParam = searchParams.get('q') || '';
   const formatParam = searchParams.get('format') || 'all';
 
@@ -27,10 +30,18 @@ export const SectionPage: React.FC = () => {
   // Determine section metadata
   const sectionMeta = useMemo(() => {
     switch (activeSection) {
+      case 'features':
+        return {
+          title: 'Features & In-Depth Reporting',
+          description: 'Substantive narrative features, field investigations, and compact dispatches from The Dispatch newsroom.',
+          formatFilter: null,
+          categoryFilter: null,
+          isInvestigations: false,
+        };
       case 'long-reads':
         return {
           title: 'Long Reads & In-Depth Reporting',
-          description: 'Substantive investigative reporting and narrative journalism exceeding 1,000 words or deep audio documentaries.',
+          description: 'Substantive investigative reporting and narrative journalism exceeding 1,000 words.',
           formatFilter: 'long-read' as StoryFormat,
           categoryFilter: null,
           isInvestigations: false,
@@ -38,7 +49,7 @@ export const SectionPage: React.FC = () => {
       case 'short-stories':
         return {
           title: 'Short Stories & Dispatches',
-          description: 'Compact dispatches, short video reports, and curated photographic features capturing focused community moments.',
+          description: 'Compact dispatches, short reports, and curated photographic features capturing focused community moments.',
           formatFilter: 'short' as StoryFormat,
           categoryFilter: null,
           isInvestigations: false,

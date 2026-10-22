@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { contentRepository } from '../../services/contentRepository';
 import { Story, StoryStatus } from '../../types';
 import {
-  Plus, Edit, Eye, Trash2, ShieldAlert,
-  Download, Upload, Users, Award, Star, LogOut, FileText
+  Plus, Edit, Eye, Trash2,
+  Download, Upload, Users, Award, Star, LogOut, FileText,
+  Database, CheckCircle2, AlertCircle, AlertTriangle
 } from 'lucide-react';
 
 export const EditorialDashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/editorial';
 
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,21 +22,23 @@ export const EditorialDashboardPage: React.FC = () => {
 
   const isEditorOrAdmin = user?.role === 'editor' || user?.role === 'admin';
   const isAdmin = user?.role === 'admin';
+  const connectionStatus = contentRepository.getConnectionStatus();
 
-  const loadStories = React.useCallback(async () => {
+  const loadStories = useCallback(async () => {
     setLoading(true);
     try {
       const all = await contentRepository.list('all', user);
       setStories(all);
-    } catch (e: any) {
-      setNotification({ message: e.message || 'Failed to load stories', type: 'error' });
+    } catch (e: unknown) {
+      const err = e instanceof Error ? e.message : 'Failed to load stories';
+      setNotification({ message: err, type: 'error' });
     } finally {
       setLoading(false);
     }
   }, [user]);
 
   useEffect(() => {
-    document.title = 'Editorial Dashboard — The Dispatch';
+    document.title = 'Editorial Workspace & Dashboard — The Dispatch';
     loadStories();
   }, [loadStories]);
 
@@ -48,8 +53,9 @@ export const EditorialDashboardPage: React.FC = () => {
         setNotification({ message: `"${story.headline}" published to front page!`, type: 'success' });
       }
       loadStories();
-    } catch (e: any) {
-      setNotification({ message: e.message || 'Action failed', type: 'error' });
+    } catch (e: unknown) {
+      const err = e instanceof Error ? e.message : 'Action failed';
+      setNotification({ message: err, type: 'error' });
     }
   };
 
@@ -59,8 +65,9 @@ export const EditorialDashboardPage: React.FC = () => {
       await contentRepository.setLead(storyId, user);
       setNotification({ message: 'Homepage lead story updated.', type: 'success' });
       loadStories();
-    } catch (e: any) {
-      setNotification({ message: e.message || 'Action failed', type: 'error' });
+    } catch (e: unknown) {
+      const err = e instanceof Error ? e.message : 'Action failed';
+      setNotification({ message: err, type: 'error' });
     }
   };
 
@@ -71,8 +78,9 @@ export const EditorialDashboardPage: React.FC = () => {
       await contentRepository.delete(storyId, user);
       setNotification({ message: 'Story deleted.', type: 'success' });
       loadStories();
-    } catch (e: any) {
-      setNotification({ message: e.message || 'Action failed', type: 'error' });
+    } catch (e: unknown) {
+      const err = e instanceof Error ? e.message : 'Action failed';
+      setNotification({ message: err, type: 'error' });
     }
   };
 
@@ -87,8 +95,9 @@ export const EditorialDashboardPage: React.FC = () => {
       a.click();
       URL.revokeObjectURL(url);
       setNotification({ message: 'Editorial archive exported successfully.', type: 'success' });
-    } catch (e: any) {
-      setNotification({ message: 'Export failed: ' + e.message, type: 'error' });
+    } catch (e: unknown) {
+      const err = e instanceof Error ? e.message : 'Export failed';
+      setNotification({ message: 'Export failed: ' + err, type: 'error' });
     }
   };
 
@@ -106,8 +115,9 @@ export const EditorialDashboardPage: React.FC = () => {
         } else {
           setNotification({ message: res.error || 'Import failed.', type: 'error' });
         }
-      } catch (err: any) {
-        setNotification({ message: 'Invalid JSON file: ' + err.message, type: 'error' });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Parse error';
+        setNotification({ message: 'Invalid JSON file: ' + msg, type: 'error' });
       }
     };
     reader.readAsText(file);
@@ -121,21 +131,36 @@ export const EditorialDashboardPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 min-h-screen">
-      {/* Top Banner: Demo Mode Warning */}
-      <div className="mb-6 p-3.5 bg-paper-200 border-l-4 border-editorial-red flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-ink-800">
-        <div className="flex items-center gap-2">
-          <ShieldAlert className="w-4 h-4 text-editorial-red flex-shrink-0" />
+      {/* Top Banner: Dynamic Database & Session Status */}
+      <div className="mb-6 p-4 bg-paper-100 border border-rule flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-ink-800">
+        <div className="flex items-center gap-2.5">
+          <Database className="w-4 h-4 text-editorial-red flex-shrink-0" />
           <span>
-            <strong>Demo mode:</strong> Data is saved only in this browser (<code className="bg-paper-100 px-1 border border-rule">localStorage</code>) and is not secure. A production backend is required for real multi-user permissions.
+            <strong>Storage status:</strong> {connectionStatus.mode}
           </span>
+          {contentRepository.isLiveDatabase() && (
+            <span className="inline-flex items-center gap-1 text-green-800 font-bold bg-green-50 px-2 py-0.5 border border-green-200">
+              <CheckCircle2 className="w-3 h-3" /> Live
+            </span>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          <span className="bg-ink-950 text-paper-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-3">
+          <span className="bg-ink-950 text-paper-100 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider">
             Role: {user?.role}
           </span>
-          <span className="text-ink-600">({user?.name})</span>
+          <span className="text-ink-700 font-semibold">({user?.name})</span>
         </div>
       </div>
+
+      {/* Prototype Security Notice */}
+      {!contentRepository.isLiveDatabase() && (
+        <div className="mb-6 p-3 bg-paper-100 border border-rule text-xs font-mono text-ink-700 flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+          <div>
+            <strong className="text-ink-950">Local Prototype Notice:</strong> Role checks in this local demo environment are simulated in browser storage and are strictly non-secure against client-side tampering. Production security requires a trusted server and database-enforced Row Level Security (RLS).
+          </div>
+        </div>
+      )}
 
       {/* Notification toast */}
       {notification && (
@@ -144,7 +169,14 @@ export const EditorialDashboardPage: React.FC = () => {
             ? 'bg-green-50 border-green-700 text-green-950'
             : 'bg-red-50 border-red-700 text-red-950'
         }`}>
-          <span>{notification.message}</span>
+          <div className="flex items-center gap-2">
+            {notification.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-green-700" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-red-700" />
+            )}
+            <span>{notification.message}</span>
+          </div>
           <button
             onClick={() => setNotification(null)}
             className="text-ink-500 hover:text-ink-950 font-bold ml-4 cursor-pointer"
@@ -171,7 +203,7 @@ export const EditorialDashboardPage: React.FC = () => {
         {/* Global Action Toolbar */}
         <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
           <Link
-            to="/editorial/new"
+            to={`${basePath}/new`}
             className="px-4 py-2 bg-editorial-red text-white font-bold uppercase tracking-wider hover:bg-ink-950 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
           >
             <Plus className="w-4 h-4" />
@@ -180,7 +212,7 @@ export const EditorialDashboardPage: React.FC = () => {
 
           {isEditorOrAdmin && (
             <Link
-              to="/editorial/contributors"
+              to={`${basePath}/contributors`}
               className="px-3 py-2 bg-paper-100 border border-ink-950 text-ink-900 font-bold hover:bg-paper-200 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Users className="w-4 h-4 text-editorial-red" />
@@ -190,7 +222,7 @@ export const EditorialDashboardPage: React.FC = () => {
 
           {isAdmin && (
             <Link
-              to="/editorial/internal"
+              to={`${basePath}/internal`}
               className="px-3 py-2 bg-ink-950 text-paper-100 font-bold hover:bg-editorial-red transition-colors flex items-center gap-1.5 cursor-pointer"
               title="Admin assessment & syllabus audit"
             >
@@ -215,9 +247,9 @@ export const EditorialDashboardPage: React.FC = () => {
           </label>
 
           <button
-            onClick={() => {
-              logout();
-              navigate('/editorial/login');
+            onClick={async () => {
+              await logout();
+              navigate(`${basePath}/login`);
             }}
             className="px-3 py-2 bg-paper-200 border border-rule text-ink-600 hover:text-editorial-red transition-colors flex items-center gap-1 cursor-pointer"
             title="Sign out of editorial session"
@@ -239,7 +271,7 @@ export const EditorialDashboardPage: React.FC = () => {
         ].map(tab => (
           <button
             key={tab.id}
-            onClick={() => setStatusFilter(tab.id as any)}
+            onClick={() => setStatusFilter(tab.id as StoryStatus | 'all')}
             className={`px-3 py-1.5 border transition-colors cursor-pointer ${
               statusFilter === tab.id
                 ? 'bg-ink-950 text-paper-100 border-ink-950 font-bold'
@@ -264,7 +296,7 @@ export const EditorialDashboardPage: React.FC = () => {
             No stories match the selected status filter.
           </p>
           <Link
-            to="/editorial/new"
+            to={`${basePath}/new`}
             className="inline-flex items-center gap-1 px-4 py-2 bg-ink-950 text-paper-100 text-xs font-mono uppercase font-bold hover:bg-editorial-red transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -305,6 +337,24 @@ export const EditorialDashboardPage: React.FC = () => {
                           Lead Story
                         </span>
                       )}
+                      {(!story.cover.isVerifiedSource || story.cover.source?.toLowerCase().includes('pinterest') || story.cover.credit?.toLowerCase().includes('pinterest')) && (
+                        <span className="ml-2 bg-amber-50 text-amber-900 border border-amber-400 px-1.5 py-0.2 text-[10px] font-mono font-bold uppercase flex items-center gap-1" title="Sourced from Pinterest / provisional reference. Pending verified original photography.">
+                          <AlertTriangle className="w-3 h-3 text-amber-700" />
+                          Provisional Image (Pinterest)
+                        </span>
+                      )}
+                      {story.sourcePdf && (
+                        <a
+                          href={story.sourcePdf.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-2 bg-blue-50 text-blue-900 border border-blue-300 px-1.5 py-0.2 text-[10px] font-mono font-bold uppercase hover:bg-blue-100 transition-colors inline-flex items-center gap-1"
+                          title={`Source PDF: ${story.sourcePdf.filename} (${Math.round(story.sourcePdf.sizeBytes / 1024)} KB)`}
+                        >
+                          <FileText className="w-3 h-3 text-blue-700" />
+                          <span>PDF: {story.sourcePdf.filename}</span>
+                        </a>
+                      )}
                     </div>
 
                     <h2 className="font-serif text-lg sm:text-xl font-bold text-ink-950 truncate mb-1">
@@ -334,7 +384,7 @@ export const EditorialDashboardPage: React.FC = () => {
 
                   {/* Edit Button */}
                   <Link
-                    to={`/editorial/edit/${story.id}`}
+                    to={`${basePath}/edit/${story.id}`}
                     className="p-2 bg-paper-100 border border-rule hover:border-ink-950 text-ink-900 transition-colors cursor-pointer"
                     title="Edit Story"
                   >
