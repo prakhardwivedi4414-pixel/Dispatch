@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #FAF7F2;
+    color: #18181A;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  h1, h2, h3, h4, .font-editorial {
+    font-family: 'Newsreader', Georgia, serif;
+    font-feature-settings: "onum" 1;
+  }
+}
+
+/* Dispatch Stamp Signature Motif Styles */
+.dispatch-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #71717A;
+}
+
+.dispatch-stamp::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: #9E1B1B;
+}
+
+/* Hairline double rules */
+.rule-double {
+  border-top: 1px solid #18181A;
+  border-bottom: 0.5px solid #D8D1C5;
+  height: 3px;
+  margin: 1.5rem 0;
+}
+
+.rule-single {
+  border-top: 1px solid #D8D1C5;
+}
+
+/* Darkroom print-proof corner registration marks */
+.proof-frame {
+  position: relative;
+}
+.proof-frame::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 8px;
+  height: 8px;
+  border-top: 1.5px solid #18181A;
+  border-left: 1.5px solid #18181A;
+  pointer-events: none;
+  z-index: 10;
+}
+.proof-frame::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-bottom: 1.5px solid #18181A;
+  border-right: 1.5px solid #18181A;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Reading Progress Bar */
+.reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2.5px;
+  background: #9E1B1B;
+  z-index: 100;
+  transition: width 0.1s linear;
+}
+
+/* Editorial Drop Cap */
+.drop-cap::first-letter {
+  font-family: 'Newsreader', Georgia, serif;
+  float: left;
+  font-size: 4.5rem;
+  line-height: 0.8;
+  padding-top: 4px;
+  padding-right: 12px;
+  padding-bottom: 2px;
+  color: #9E1B1B;
+  font-weight: 700;
+}
+
+/* Editorial Pullquote styling */
+.pullquote {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 1.45rem;
+  line-height: 1.45;
+  border-left: 3px solid #9E1B1B;
+  padding: 1.25rem 1.75rem;
+  margin: 2.5rem 0;
+  color: #18181A;
+  background-color: #F4EFE6;
+}
+
+/* Editorial scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF7F2;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8D1C5;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B5ACA0;
+}
+
+/* 3D Orbit Stage */
+.orbit-stage {
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+
+/* Global reduced-motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
